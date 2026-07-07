@@ -1,0 +1,8 @@
+streamlit>=1.33.0
+requests>=2.31.0
+pydantic-ai-slim[openai]>=0.2.0
+openai>=1.0.0
+fastmcp>=2.0.0
+feedparser>=6.0.0
+beautifulsoup4>=4.12.0
+langdetect>=1.0.9
