@@ -18,7 +18,9 @@ from __future__ import annotations
 import json
 import os
 import threading
+import time
 import uuid
+from contextlib import contextmanager
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -34,6 +36,14 @@ from pydantic_ai.messages import (
 )
 
 from core.settings import settings
+from core.db import (
+    Database,
+    PG_KEY_FACTS,
+    PG_KEY_PROFILE,
+    PG_KEY_TOOL_LEDGER,
+    REDIS_KEY_ACTIVE_CONV,
+    REDIS_KEY_ACTION_STATES,
+)
 
 _VN_TZ = timezone(timedelta(hours=7))
 
@@ -79,15 +89,28 @@ class AssistantMemory:
         self,
         file_path: Path | None = None,
         max_messages: int | None = None,
+        use_db: bool | None = None,
+        db: Database | None = None,
     ) -> None:
         self.file_path = file_path or settings.memory_file
         self.max_messages = max_messages or settings.memory_max_messages
-        self._lock = threading.Lock()
+        self.use_db = settings.use_db if use_db is None else use_db
+        self._lock_path = self.file_path.with_name(self.file_path.name + ".lock")
+        self._lock_depth = threading.local()
 
-        # Conversation directory
+        # Conversation directory (used by the JSON backend)
         self.conv_dir = self.file_path.parent / "conversations"
         self.conv_dir.mkdir(parents=True, exist_ok=True)
         self.index_file = self.conv_dir / "index.json"
+
+        # Persistence backend
+        self._db: Database | None = None
+        if db is not None:
+            self._db = db
+        elif self.use_db:
+            self._db = Database()
+        if self._db is not None:
+            self._db.init_schema()
 
         # Load global memory
         self.global_store = self._load_global()
@@ -101,7 +124,96 @@ class AssistantMemory:
 
     # ── Global Memory ────────────────────────────────────────────────────────
 
+    # ── Concurrency / atomic persistence helpers ─────────────────────────────
+
+    @staticmethod
+    def _atomic_write(path: Path, text: str) -> None:
+        """Write *text* to *path* atomically (temp file + os.replace)."""
+        tmp = path.with_name(path.name + ".tmp")
+        tmp.write_text(text, encoding="utf-8")
+        os.replace(tmp, path)
+
+    @contextmanager
+    def _process_lock(self):
+        """Cross-process/cross-thread lock serialising every memory write.
+
+        Uses an ``O_CREAT | O_EXCL`` lockfile next to ``memory.json`` so two
+        Python processes sharing the same ``data/`` directory cannot interleave
+        a read-modify-write and silently lose an update.  Re-entrant per thread.
+        """
+        depth = getattr(self._lock_depth, "value", 0)
+        if depth > 0:
+            self._lock_depth.value = depth + 1
+            try:
+                yield
+            finally:
+                self._lock_depth.value = depth
+            return
+
+        deadline = time.monotonic() + 15.0
+        while True:
+            try:
+                fd = os.open(self._lock_path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+                try:
+                    os.write(fd, str(os.getpid()).encode("ascii"))
+                finally:
+                    os.close(fd)
+                break
+            except (FileExistsError, PermissionError):
+                # Windows may raise PermissionError (sharing violation) instead of
+                # FileExistsError while another process holds the lockfile open.
+                if time.monotonic() > deadline:
+                    # Last resort: drop a stale lock left by a crashed process.
+                    try:
+                        if time.time() - os.path.getmtime(self._lock_path) > 30.0:
+                            os.remove(self._lock_path)
+                            continue
+                    except FileNotFoundError:
+                        continue
+                    raise TimeoutError(
+                        f"Could not acquire memory lock {self._lock_path.name} "
+                        "(another process is writing)."
+                    )
+                time.sleep(0.05)
+
+        self._lock_depth.value = 1
+        try:
+            yield
+        finally:
+            self._lock_depth.value = 0
+            try:
+                os.remove(self._lock_path)
+            except FileNotFoundError:
+                pass
+
+    def _reload_global(self) -> None:
+        self.global_store = self._load_global()
+
+    def _reload_conversation(self) -> None:
+        self.conv_store = self._load_conversation(self.current_conversation_id)
+
+    @staticmethod
+    def _msg_text(msg: ModelMessage) -> str:
+        try:
+            parts: List[str] = []
+            for part in getattr(msg, "parts", []):
+                content = getattr(part, "content", "")
+                if isinstance(content, str):
+                    parts.append(content)
+            return "".join(parts)
+        except Exception:
+            return ""
+
     def _load_global(self) -> GlobalMemoryStore:
+        if self._db is not None:
+            return GlobalMemoryStore(
+                profile=self._db.kv_get(PG_KEY_PROFILE) or {},
+                facts=self._db.kv_get(PG_KEY_FACTS) or [],
+                action_states=self._db.redis_get_json(REDIS_KEY_ACTION_STATES) or {},
+                tool_ledger=(self._db.kv_get(PG_KEY_TOOL_LEDGER) or [])[:300],
+                active_conversation_id=self._db.redis_get_json(REDIS_KEY_ACTIVE_CONV) or "",
+            )
+
         if not self.file_path.exists():
             return GlobalMemoryStore()
 
@@ -116,7 +228,13 @@ class AssistantMemory:
         )
 
     def _save_global(self) -> None:
-        from pydantic_core import to_jsonable_python
+        if self._db is not None:
+            self._db.kv_set(PG_KEY_PROFILE, self.global_store.profile)
+            self._db.kv_set(PG_KEY_FACTS, self.global_store.facts)
+            self._db.kv_set(PG_KEY_TOOL_LEDGER, self.global_store.tool_ledger[-300:])
+            self._db.redis_set_json(REDIS_KEY_ACTION_STATES, self.global_store.action_states)
+            self._db.redis_set_json(REDIS_KEY_ACTIVE_CONV, self.global_store.active_conversation_id)
+            return
 
         payload = {
             "memory_version": self.global_store.memory_version,
@@ -126,13 +244,35 @@ class AssistantMemory:
             "tool_ledger": self.global_store.tool_ledger[-300:],
             "active_conversation_id": self.global_store.active_conversation_id,
         }
-        self.file_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+        self._atomic_write(self.file_path, json.dumps(payload, ensure_ascii=False, indent=2))
 
     # ── Conversation Management ──────────────────────────────────────────────
+
+    def _conversation_exists(self, conv_id: str) -> bool:
+        if self._db is not None:
+            return self._db.get_conversation(conv_id) is not None
+        return (self.conv_dir / f"{conv_id}.json").exists()
 
     def _load_conversation(self, conv_id: str) -> ConversationStore:
         if not conv_id:
             return ConversationStore()
+
+        if self._db is not None:
+            data = self._db.get_conversation(conv_id)
+            if data is None:
+                return ConversationStore()
+            conversation: List[ModelMessage] = []
+            raw_conv = data.get("messages", [])
+            if raw_conv:
+                try:
+                    conversation = ModelMessagesTypeAdapter.validate_python(raw_conv)
+                    conversation = self._clean_tool_messages(conversation)
+                except Exception:
+                    conversation = []
+            return ConversationStore(
+                conversation=conversation,
+                recent_context=data.get("recent_context", {}),
+            )
 
         conv_file = self.conv_dir / f"{conv_id}.json"
         if not conv_file.exists():
@@ -157,6 +297,16 @@ class AssistantMemory:
         if not self.current_conversation_id:
             return
 
+        if self._db is not None:
+            from pydantic_core import to_jsonable_python
+
+            self._db.save_conversation_content(
+                self.current_conversation_id,
+                to_jsonable_python(self.conv_store.conversation),
+                self.conv_store.recent_context,
+            )
+            return
+
         conv_file = self.conv_dir / f"{self.current_conversation_id}.json"
         from pydantic_core import to_jsonable_python
 
@@ -164,16 +314,21 @@ class AssistantMemory:
             "conversation": to_jsonable_python(self.conv_store.conversation),
             "recent_context": self.conv_store.recent_context,
         }
-        conv_file.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+        self._atomic_write(conv_file, json.dumps(payload, ensure_ascii=False, indent=2))
 
     def _load_index(self) -> List[Dict[str, Any]]:
+        if self._db is not None:
+            return self._db.list_conversations()
         if not self.index_file.exists():
             return []
         data = json.loads(self.index_file.read_text(encoding="utf-8"))
         return data if isinstance(data, list) else []
 
     def _save_index(self, index: List[Dict[str, Any]]) -> None:
-        self.index_file.write_text(json.dumps(index, ensure_ascii=False, indent=2), encoding="utf-8")
+        if self._db is not None:
+            self._db.sync_index(index)
+            return
+        self._atomic_write(self.index_file, json.dumps(index, ensure_ascii=False, indent=2))
 
     # ── Public API: Conversation CRUD ────────────────────────────────────────
 
@@ -192,96 +347,101 @@ class AssistantMemory:
         conv_id = str(uuid.uuid4())[:8]
         now = datetime.now(_VN_TZ).isoformat()
 
-        # Add to index
-        index = self._load_index()
-        index.append({
-            "id": conv_id,
-            "name": name,
-            "created_at": now,
-            "updated_at": now,
-            "message_count": 0,
-        })
-        self._save_index(index)
+        with self._process_lock():
+            # Add to index
+            index = self._load_index()
+            index.append({
+                "id": conv_id,
+                "name": name,
+                "created_at": now,
+                "updated_at": now,
+                "message_count": 0,
+            })
+            self._save_index(index)
 
-        # Switch to new conversation
-        self.current_conversation_id = conv_id
-        self.conv_store = ConversationStore()
-        self.global_store.active_conversation_id = conv_id
-        self._save_global()
+            # Switch to new conversation
+            self.current_conversation_id = conv_id
+            self.conv_store = ConversationStore()
+            self._reload_global()
+            self.global_store.active_conversation_id = conv_id
+            self._save_global()
 
         return conv_id
 
     def switch_conversation(self, conv_id: str) -> bool:
         """Switch to an existing conversation. Returns True if successful."""
-        # Save current conversation first
-        self._save_conversation()
+        with self._process_lock():
+            # Save current conversation first
+            self._save_conversation()
 
-        # Load target conversation
-        conv_file = self.conv_dir / f"{conv_id}.json"
-        if not conv_file.exists():
-            return False
+            # Load target conversation
+            if not self._conversation_exists(conv_id):
+                return False
 
-        self.current_conversation_id = conv_id
-        self.conv_store = self._load_conversation(conv_id)
-        self.global_store.active_conversation_id = conv_id
-        self._save_global()
+            self.current_conversation_id = conv_id
+            self.conv_store = self._load_conversation(conv_id)
+            self._reload_global()
+            self.global_store.active_conversation_id = conv_id
+            self._save_global()
         return True
 
     def rename_conversation(self, conv_id: str, new_name: str) -> bool:
         """Rename a conversation."""
-        index = self._load_index()
-        for conv in index:
-            if conv["id"] == conv_id:
-                conv["name"] = new_name
-                self._save_index(index)
-                return True
+        with self._process_lock():
+            index = self._load_index()
+            for conv in index:
+                if conv["id"] == conv_id:
+                    conv["name"] = new_name
+                    self._save_index(index)
+                    return True
         return False
 
     def delete_conversation(self, conv_id: str) -> bool:
         """Delete a conversation. If it's the active one, create a new one."""
-        index = self._load_index()
-        index = [c for c in index if c["id"] != conv_id]
-        self._save_index(index)
+        with self._process_lock():
+            index = self._load_index()
+            index = [c for c in index if c["id"] != conv_id]
+            self._save_index(index)
 
-        # Delete conversation file
-        conv_file = self.conv_dir / f"{conv_id}.json"
-        if conv_file.exists():
-            conv_file.unlink()
+            # Delete conversation file
+            conv_file = self.conv_dir / f"{conv_id}.json"
+            if conv_file.exists():
+                conv_file.unlink()
 
-        # If deleted active conversation, create new one
-        if self.current_conversation_id == conv_id:
-            self.current_conversation_id = ""
-            self.conv_store = ConversationStore()
-            self.create_conversation()
-            return True
-
+            # If deleted active conversation, create new one
+            if self.current_conversation_id == conv_id:
+                self.current_conversation_id = ""
+                self.conv_store = ConversationStore()
+                self.create_conversation()
         return True
 
     def auto_rename_first_message(self, conv_id: str, user_message: str) -> None:
         """Auto-rename conversation from first user message (if still default name)."""
-        index = self._load_index()
-        for conv in index:
-            if conv["id"] == conv_id and conv["name"] == "Cuộc trò chuyện mới":
-                # Use first 50 chars of message as name
-                name = user_message.strip()[:50]
-                if len(user_message) > 50:
-                    name += "..."
-                conv["name"] = name
-                self._save_index(index)
-                break
+        with self._process_lock():
+            index = self._load_index()
+            for conv in index:
+                if conv["id"] == conv_id and conv["name"] == "Cuộc trò chuyện mới":
+                    # Use first 50 chars of message as name
+                    name = user_message.strip()[:50]
+                    if len(user_message) > 50:
+                        name += "..."
+                    conv["name"] = name
+                    self._save_index(index)
+                    break
 
     def update_conversation_timestamp(self) -> None:
         """Update the updated_at timestamp for current conversation."""
         if not self.current_conversation_id:
             return
-        index = self._load_index()
-        now = datetime.now(_VN_TZ).isoformat()
-        for conv in index:
-            if conv["id"] == self.current_conversation_id:
-                conv["updated_at"] = now
-                conv["message_count"] = conv.get("message_count", 0) + 1
-                self._save_index(index)
-                break
+        with self._process_lock():
+            index = self._load_index()
+            now = datetime.now(_VN_TZ).isoformat()
+            for conv in index:
+                if conv["id"] == self.current_conversation_id:
+                    conv["updated_at"] = now
+                    conv["message_count"] = conv.get("message_count", 0) + 1
+                    self._save_index(index)
+                    break
 
     # ── Conversation Content ─────────────────────────────────────────────────
 
@@ -291,8 +451,10 @@ class AssistantMemory:
 
     def set_message_history(self, messages: List[ModelMessage]) -> None:
         """Replace conversation history."""
-        self.conv_store.conversation = messages[-self.max_messages:]
-        self._save_conversation()
+        with self._process_lock():
+            self._reload_conversation()
+            self.conv_store.conversation = messages[-self.max_messages:]
+            self._save_conversation()
 
     def get_recent_context(self) -> Dict[str, str]:
         """Get recent context for follow-up resolution."""
@@ -300,20 +462,24 @@ class AssistantMemory:
 
     def set_recent_context(self, entity: str, topic: str, query: str) -> None:
         """Store context for follow-up query resolution."""
-        self.conv_store.recent_context = {
-            "entity": entity.strip(),
-            "topic": topic.strip(),
-            "query": query.strip(),
-        }
-        self._save_conversation()
+        with self._process_lock():
+            self._reload_conversation()
+            self.conv_store.recent_context = {
+                "entity": entity.strip(),
+                "topic": topic.strip(),
+                "query": query.strip(),
+            }
+            self._save_conversation()
 
     def clear_recent_context(self) -> None:
         """Clear recent context."""
-        self.conv_store.recent_context = {}
-        self._save_conversation()
+        with self._process_lock():
+            self._reload_conversation()
+            self.conv_store.recent_context = {}
+            self._save_conversation()
 
     def add_action_to_history(self, user_text: str, assistant_text: str) -> None:
-        """Add user/assistant pair to conversation history."""
+        """Add user/assistant pair to conversation history (idempotent)."""
         now = datetime.now(_VN_TZ)
 
         user_msg = ModelRequest(
@@ -323,37 +489,55 @@ class AssistantMemory:
             parts=[TextPart(content=assistant_text)],
         )
 
-        self.conv_store.conversation.append(user_msg)
-        self.conv_store.conversation.append(assistant_msg)
+        with self._process_lock():
+            self._reload_conversation()
 
-        if len(self.conv_store.conversation) > self.max_messages:
-            self.conv_store.conversation = self.conv_store.conversation[-self.max_messages:]
+            # Idempotency: skip if this exact pair is already the last one
+            # (e.g. the LLM call was retried after a partial save).
+            conv = self.conv_store.conversation
+            if len(conv) >= 2 and self._msg_text(conv[-2]) == user_text and self._msg_text(conv[-1]) == assistant_text:
+                return
 
-        self._save_conversation()
+            conv.append(user_msg)
+            conv.append(assistant_msg)
+
+            if len(conv) > self.max_messages:
+                self.conv_store.conversation = conv[-self.max_messages:]
+
+            self._save_conversation()
+
         self.update_conversation_timestamp()
 
     # ── Global Memory (profile, facts, action_states) ────────────────────────
 
     def remember_fact(self, fact: str) -> None:
         normalized = fact.strip()
-        if normalized and normalized not in self.global_store.facts:
-            self.global_store.facts.append(normalized)
-            self._save_global()
+        if not normalized:
+            return
+        with self._process_lock():
+            self._reload_global()
+            if normalized not in self.global_store.facts:
+                self.global_store.facts.append(normalized)
+                self._save_global()
 
     def set_profile(self, key: str, value: str) -> None:
-        self.global_store.profile[key] = value.strip()
-        self._save_global()
+        with self._process_lock():
+            self._reload_global()
+            self.global_store.profile[key] = value.strip()
+            self._save_global()
 
     def get_action_state(self, action_type: str) -> Dict[str, Any]:
         return dict(self.global_store.action_states.get(action_type, {}))
 
     def set_action_state(self, action_type: str, state: Dict[str, Any]) -> None:
-        with self._lock:
+        with self._process_lock():
+            self._reload_global()
             self.global_store.action_states[action_type] = state
             self._save_global()
 
     def clear_action_state(self, action_type: str) -> None:
-        with self._lock:
+        with self._process_lock():
+            self._reload_global()
             self.global_store.action_states.pop(action_type, None)
             self._save_global()
 
@@ -367,7 +551,8 @@ class AssistantMemory:
             "provider": provider,
             "status": status,
         }
-        with self._lock:
+        with self._process_lock():
+            self._reload_global()
             self.global_store.tool_ledger.append(entry)
             if len(self.global_store.tool_ledger) > 300:
                 self.global_store.tool_ledger = self.global_store.tool_ledger[-300:]

@@ -12,26 +12,52 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict
 
+
+def _load_dotenv(path: Path | None = None) -> None:
+    """Nạp biến từ file .env vào os.environ (chỉ set nếu chưa có trong môi trường).
+
+    App không phụ thuộc python-dotenv nên tự parse file .env ở gốc dự án
+    để các biến ASSISTANT_*/EXCHANGERATE_*/TAVILY_*/EXA_* được đọc đúng.
+    """
+    if path is None:
+        path = Path(__file__).resolve().parent.parent / ".env"
+    try:
+        lines = path.read_text(encoding="utf-8-sig").splitlines()
+    except OSError:
+        return
+    for raw in lines:
+        line = raw.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, _, value = line.partition("=")
+        key = key.strip()
+        value = value.strip().strip('"').strip("'")
+        if key and key not in os.environ:
+            os.environ[key] = value
+
+
+_load_dotenv()
+
 # ── Profile definitions ─────────────────────────────────────────────────────
 # Each profile maps setting names to their override values.
 # Only settings NOT already set via environment variables are applied.
 
 _PROFILE_DEMO_FAST: Dict[str, Any] = {
-    "max_response_chars": 2400,
+    "max_response_chars": 4000,
     "llm_temperature": 0.1,
-    "llm_max_completion_tokens": 4096,
+    "llm_max_completion_tokens": 8192,
 }
 
 _PROFILE_BALANCED: Dict[str, Any] = {
-    "max_response_chars": 2600,
+    "max_response_chars": 4500,
     "llm_temperature": 0.1,
-    "llm_max_completion_tokens": 4096,
+    "llm_max_completion_tokens": 8192,
 }
 
 _PROFILE_ACCURATE: Dict[str, Any] = {
-    "max_response_chars": 3000,
+    "max_response_chars": 5000,
     "llm_temperature": 0.1,
-    "llm_max_completion_tokens": 4096,
+    "llm_max_completion_tokens": 8192,
 }
 
 _PROFILES: Dict[str, Dict[str, Any]] = {
@@ -54,11 +80,9 @@ class Settings:
     base_url: str = os.getenv("ASSISTANT_BASE_URL", "https://api.openai.com/v1")
     model: str = os.getenv("ASSISTANT_MODEL", "flash")
     runtime_profile: str = os.getenv("ASSISTANT_RUNTIME_PROFILE", "demo_fast")
-    max_response_chars: int = int(os.getenv("ASSISTANT_MAX_RESPONSE_CHARS", "2400"))
+    max_response_chars: int = int(os.getenv("ASSISTANT_MAX_RESPONSE_CHARS", "4000"))
     llm_temperature: float = float(os.getenv("ASSISTANT_LLM_TEMPERATURE", "0.1"))
-    llm_max_completion_tokens: int = int(os.getenv("ASSISTANT_LLM_MAX_COMPLETION_TOKENS", "4096"))
-    direct_weather_routing: bool = os.getenv("ASSISTANT_DIRECT_WEATHER_ROUTING", "true").lower() == "true"
-    direct_memory_routing: bool = os.getenv("ASSISTANT_DIRECT_MEMORY_ROUTING", "true").lower() == "true"
+    llm_max_completion_tokens: int = int(os.getenv("ASSISTANT_LLM_MAX_COMPLETION_TOKENS", "8192"))
     memory_max_messages: int = int(os.getenv("ASSISTANT_MEMORY_MAX_MESSAGES", "12"))
     data_dir: Path = Path(os.getenv("ASSISTANT_DATA_DIR", "data"))
     memory_file: Path = Path(os.getenv("ASSISTANT_MEMORY_FILE", "data/memory.json"))
@@ -67,9 +91,24 @@ class Settings:
     search_time_sensitive_cache_ttl_sec: int = int(os.getenv("ASSISTANT_SEARCH_TIME_SENSITIVE_CACHE_TTL_SEC", "75"))
     search_failed_query_cooldown_sec: int = int(os.getenv("ASSISTANT_SEARCH_FAILED_QUERY_COOLDOWN_SEC", "20"))
     search_empty_evidence_cache_ttl_sec: int = int(os.getenv("ASSISTANT_SEARCH_EMPTY_EVIDENCE_CACHE_TTL_SEC", "45"))
+    search_ddg_timeout_sec: int = int(os.getenv("ASSISTANT_SEARCH_DDG_TIMEOUT_SEC", "8"))
+    search_ddg_failure_threshold: int = int(os.getenv("ASSISTANT_SEARCH_DDG_FAILURE_THRESHOLD", "5"))
+    search_ddg_blocked_signature: str = os.getenv("ASSISTANT_SEARCH_DDG_BLOCKED_SIGNATURE", "TLS close_notify")
     tavily_api_key: str = os.getenv("TAVILY_API_KEY", "")
     exa_api_key: str = os.getenv("EXA_API_KEY", "")
     exchangerate_api_key: str = os.getenv("EXCHANGERATE_API_KEY", "")
+
+    # ── Persistence (PostgreSQL + Redis) ──────────────────────────────────────
+    # use_db = "1"/"true"/"yes" enables DB persistence; otherwise the JSON files
+    # under data/ are used. Credentials come from .env (never hardcoded here).
+    use_db: bool = os.getenv("ASSISTANT_USE_DB", "0").strip().lower() in ("1", "true", "yes")
+    postgres_host: str = os.getenv("POSTGRES_HOST", "localhost")
+    postgres_port: int = int(os.getenv("POSTGRES_PORT", "5433"))
+    postgres_user: str = os.getenv("POSTGRES_USER", "assistant")
+    postgres_password: str = os.getenv("POSTGRES_PASSWORD", "")
+    postgres_db: str = os.getenv("POSTGRES_DB", "assistant")
+    redis_host: str = os.getenv("REDIS_HOST", "localhost")
+    redis_port: int = int(os.getenv("REDIS_PORT", "6379"))
 
     def ensure_directories(self) -> None:
         self.data_dir.mkdir(parents=True, exist_ok=True)
