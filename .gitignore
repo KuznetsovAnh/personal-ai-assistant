@@ -41,6 +41,7 @@ htmlcov/
 
 # Runtime data
 data/
+data.backup/
 *.db
 *.sqlite
 *.sqlite3

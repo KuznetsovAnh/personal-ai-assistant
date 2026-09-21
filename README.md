@@ -105,6 +105,8 @@ Use `.env.example` as a safe template for the variables you need in your local e
 | `ASSISTANT_LLM_MAX_COMPLETION_TOKENS` | Maximum LLM completion tokens |
 | `ASSISTANT_MEMORY_FILE` | Path to the memory JSON file |
 | `ASSISTANT_DATA_DIR` | Runtime data directory |
+| `ASSISTANT_SEARCH_DDG_FAILURE_THRESHOLD` | Skip DuckDuckGo after this many blocking failures |
+| `ASSISTANT_SEARCH_DDG_BLOCKED_SIGNATURE` | Substring in a DDG error that counts as a block |
 | `TAVILY_API_KEY` | Optional Tavily key for search fallback |
 | `EXA_API_KEY` | Optional Exa key for search fallback |
 | `EXCHANGERATE_API_KEY` | ExchangeRate-API key |

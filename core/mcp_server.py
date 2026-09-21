@@ -1,4 +1,4 @@
-﻿"""MCP Server â€” expose all assistant tools via Model Context Protocol.
+﻿"""MCP Server — expose all assistant tools via Model Context Protocol.
 
 Run standalone:
     python -m core.mcp_server
@@ -29,144 +29,144 @@ from core.tools import (
 mcp = FastMCP("ROBOTS Personal Assistant")
 
 
-# â”€â”€ Weather â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Weather ──────────────────────────────────────────────────────────────────
 @mcp.tool()
 def mcp_get_weather(location: str) -> str:
-    """Láº¥y thá»i tiáº¿t hiá»‡n táº¡i vÃ  dá»± bÃ¡o hÃ´m nay theo Ä‘á»‹a Ä‘iá»ƒm.
+    """Lấy thời tiết hiện tại và dự báo hôm nay theo địa điểm.
 
     Args:
-        location: TÃªn thÃ nh phá»‘ hoáº·c Ä‘á»‹a Ä‘iá»ƒm cáº§n láº¥y thá»i tiáº¿t.
+        location: Tên thành phố hoặc địa điểm cần lấy thời tiết.
     """
     return get_weather(location)
 
 
-# â”€â”€ Web Search â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Web Search ───────────────────────────────────────────────────────────────
 @mcp.tool()
 def mcp_web_search(query: str) -> str:
-    """TÃ¬m kiáº¿m thÃ´ng tin má»›i nháº¥t trÃªn web.
+    """Tìm kiếm thông tin mới nhất trên web.
 
     Args:
-        query: Truy váº¥n cáº§n tÃ¬m kiáº¿m trÃªn web.
+        query: Truy vấn cần tìm kiếm trên web.
     """
     return web_search(query)
 
 
-# â”€â”€ Save Memory â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Save Memory ──────────────────────────────────────────────────────────────
 @mcp.tool()
 def mcp_save_memory(fact: str) -> str:
-    """LÆ°u má»™t sá»± tháº­t hoáº·c sá»Ÿ thÃ­ch quan trá»ng cá»§a ngÆ°á»i dÃ¹ng vÃ o bá»™ nhá»› dÃ i háº¡n.
+    """Lưu một sự thật hoặc sở thích quan trọng của người dùng vào bộ nhớ dài hạn.
 
     Args:
-        fact: ThÃ´ng tin ngáº¯n gá»n cáº§n ghi nhá»› vá» ngÆ°á»i dÃ¹ng.
+        fact: Thông tin ngắn gọn cần ghi nhớ về người dùng.
     """
     return save_memory(fact)
 
 
-# â”€â”€ Current Datetime â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Current Datetime ─────────────────────────────────────────────────────────
 @mcp.tool()
 def mcp_get_current_datetime() -> str:
-    """Láº¥y ngÃ y giá» hiá»‡n táº¡i theo mÃºi giá» Viá»‡t Nam (UTC+7)."""
+    """Lấy ngày giờ hiện tại theo múi giờ Việt Nam (UTC+7)."""
     return get_current_datetime()
 
 
-# â”€â”€ Calculate â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Calculate ────────────────────────────────────────────────────────────────
 @mcp.tool()
 def mcp_calculate(expression: str) -> str:
-    """TÃ­nh toÃ¡n biá»ƒu thá»©c toÃ¡n há»c Ä‘Æ¡n giáº£n.
+    """Tính toán biểu thức toán học đơn giản.
 
     Args:
-        expression: Biá»ƒu thá»©c toÃ¡n há»c cáº§n tÃ­nh (vÃ­ dá»¥: '1+1', '15*3', '100/4').
+        expression: Biểu thức toán học cần tính (ví dụ: '1+1', '15*3', '100/4').
     """
     return calculate(expression)
 
 
-# â”€â”€ Translate â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Translate ────────────────────────────────────────────────────────────────
 @mcp.tool()
 def mcp_translate_text(text: str, target_lang: str = "en") -> str:
-    """Dá»‹ch vÄƒn báº£n sang ngÃ´n ngá»¯ khÃ¡c.
+    """Dịch văn bản sang ngôn ngữ khác.
 
     Args:
-        text: VÄƒn báº£n cáº§n dá»‹ch.
-        target_lang: MÃ£ ngÃ´n ngá»¯ Ä‘Ã­ch (en, vi, ja, ko, zh, fr, de, ...).
+        text: Văn bản cần dịch.
+        target_lang: Mã ngôn ngữ đích (en, vi, ja, ko, zh, fr, de, ...).
     """
     return translate_text(text, target_lang)
 
 
-# â”€â”€ Knowledge Search â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Knowledge Search ─────────────────────────────────────────────────────────
 @mcp.tool()
 def mcp_knowledge_search(query: str, topic: str = "general") -> str:
-    """TÃ¬m kiáº¿m kiáº¿n thá»©c chuyÃªn sÃ¢u vá» má»™t chá»§ Ä‘á» cá»¥ thá»ƒ.
+    """Tìm kiếm kiến thức chuyên sâu về một chủ đề cụ thể.
 
     Args:
-        query: CÃ¢u há»i hoáº·c chá»§ Ä‘á» cáº§n tÃ¬m kiáº¿m.
-        topic: LÄ©nh vá»±c (general, science, tech, history, geography).
+        query: Câu hỏi hoặc chủ đề cần tìm kiếm.
+        topic: Lĩnh vực (general, science, tech, history, geography).
     """
     return knowledge_search(query, topic)
 
 
-# â”€â”€ Exchange Rate â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Exchange Rate ─────────────────────────────────────────────────────────────
 @mcp.tool()
 def mcp_get_exchange_rate(base_currency: str = "USD", target_currency: str = "VND") -> str:
-    """Láº¥y tá»· giÃ¡ ngoáº¡i tá»‡ má»›i nháº¥t.
+    """Lấy tỷ giá ngoại tệ mới nhất.
 
     Args:
-        base_currency: MÃ£ tiá»n tá»‡ gá»‘c (vÃ­ dá»¥: USD, EUR, JPY, GBP).
-        target_currency: MÃ£ tiá»n tá»‡ Ä‘Ã­ch (vÃ­ dá»¥: VND, USD, EUR).
+        base_currency: Mã tiền tệ gốc (ví dụ: USD, EUR, JPY, GBP).
+        target_currency: Mã tiền tệ đích (ví dụ: VND, USD, EUR).
     """
     return get_exchange_rate(base_currency, target_currency)
 
 
-# â”€â”€ Music_tool / Play Music â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Music_tool / Play Music ───────────────────────────────────────────────────
 @mcp.tool()
 def mcp_play_music(url: str) -> str:
-    """Music_tool.play_music â€” phÃ¡t nháº¡c tá»« URL (YouTube, SoundCloud, hoáº·c link MP3 trá»±c tiáº¿p).
+    """Music_tool.play_music — phát nhạc từ URL (YouTube, SoundCloud, hoặc link MP3 trực tiếp).
 
     Args:
-        url: ÄÆ°á»ng link bÃ i hÃ¡t (YouTube URL, SoundCloud URL, hoáº·c link MP3).
+        url: Đường link bài hát (YouTube URL, SoundCloud URL, hoặc link MP3).
     """
     return play_music(url)
 
 
-# â”€â”€ Music_tool / Stop Music â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Music_tool / Stop Music ───────────────────────────────────────────────────
 @mcp.tool()
 def mcp_stop_music(song_hint: str = "") -> str:
-    """Music_tool.stop_music â€” táº¯t nháº¡c vÃ  Ä‘Ã³ng cá»­a sá»• nháº¡c Ä‘ang phÃ¡t (Æ°u tiÃªn match theo tÃªn bÃ i náº¿u cÃ³).
+    """Music_tool.stop_music — tắt nhạc và đóng cửa sổ nhạc đang phát (ưu tiên match theo tên bài nếu có).
 
     Args:
-        song_hint: Tá»« khÃ³a tÃªn bÃ i hÃ¡t Ä‘á»ƒ Ä‘Ã³ng Ä‘Ãºng cá»­a sá»• tÆ°Æ¡ng á»©ng.
+        song_hint: Từ khóa tên bài hát để đóng đúng cửa sổ tương ứng.
     """
     return stop_music(song_hint=song_hint or None)
 
 
-# â”€â”€ Music_tool / Pause Music â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Music_tool / Pause Music ──────────────────────────────────────────────────
 @mcp.tool()
 def mcp_pause_music() -> str:
-    """Music_tool.pause_music â€” táº¡m dá»«ng nháº¡c Ä‘ang phÃ¡t (khÃ´ng Ä‘Ã³ng tab)."""
+    """Music_tool.pause_music — tạm dừng nhạc đang phát (không đóng tab)."""
     return pause_music()
 
 
-# â”€â”€ Music_tool / Resume Music â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Music_tool / Resume Music ─────────────────────────────────────────────────
 @mcp.tool()
 def mcp_resume_music() -> str:
-    """Music_tool.resume_music â€” tiáº¿p tá»¥c phÃ¡t nháº¡c Ä‘ang táº¡m dá»«ng (khÃ´ng má»Ÿ tab má»›i)."""
+    """Music_tool.resume_music — tiếp tục phát nhạc đang tạm dừng (không mở tab mới)."""
     return resume_music()
 
 
-# â”€â”€ Stock Price â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Stock Price ───────────────────────────────────────────────────────────────
 @mcp.tool()
 def mcp_get_stock_price(ticker: str) -> str:
-    """Láº¥y giÃ¡ cá»• phiáº¿u realtime tá»« CafeF (VN) hoáº·c Yahoo Finance (quá»‘c táº¿).
+    """Lấy giá cổ phiếu realtime từ CafeF (VN) hoặc Yahoo Finance (quốc tế).
 
     Args:
-        ticker: MÃ£ cá»• phiáº¿u (VD: VIC, VNM, HPG, AAPL, NVDA, MSFT).
+        ticker: Mã cổ phiếu (VD: VIC, VNM, HPG, AAPL, NVDA, MSFT).
     """
     return get_stock_price(ticker)
 
 
-# â”€â”€ MCP Resources (contextual info) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── MCP Resources (contextual info) ─────────────────────────────────────────
 @mcp.resource("assistant://info")
 def assistant_info() -> str:
-    """ThÃ´ng tin vá» assistant hiá»‡n táº¡i."""
+    """Thông tin về assistant hiện tại."""
     from core.settings import settings
     return (
         f"ROBOTS Personal Assistant\n"

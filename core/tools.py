@@ -83,7 +83,7 @@ DOMAIN_VIETSTOCK = "vietstock.vn"
 DOMAIN_VNECONOMY = "vneconomy.vn"
 
 _VN_TZ = zoneinfo.ZoneInfo(VN_TZ_NAME)
-_VN_WEEKDAYS = ["Thá»© Hai", "Thá»© Ba", "Thá»© TÆ°", "Thá»© NÄƒm", "Thá»© SÃ¡u", "Thá»© Báº£y", "Chá»§ Nháº­t"]
+_VN_WEEKDAYS = ["Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy", "Chủ Nhật"]
 
 logger = logging.getLogger(__name__)
 
@@ -96,21 +96,21 @@ def get_current_datetime() -> str:
     """Return the current system date and time in Vietnam timezone."""
     now_vn = datetime.now(_VN_TZ)
     weekday = _VN_WEEKDAYS[now_vn.weekday()]
-    return now_vn.strftime(f"%H:%M:%S, {weekday}, ngÃ y %d/%m/%Y (giá» Viá»‡t Nam, UTC+7)")
+    return now_vn.strftime(f"%H:%M:%S, {weekday}, ngày %d/%m/%Y (giờ Việt Nam, UTC+7)")
 
 
 def save_memory(fact: str) -> str:
     """Save an important fact about the user (e.g., name, preferences)."""
-    return f"ÄÃ£ ghi nhá»› thÃ´ng tin: {fact}"
+    return f"Đã ghi nhớ thông tin: {fact}"
 
 
 def translate_text(text: str, target_lang: str) -> str:
     """Translate text to the target language."""
-    return f"Báº£n dá»‹ch ({target_lang}): {text}"
+    return f"Bản dịch ({target_lang}): {text}"
 
 
 def search(query: str, max_results: int = 5, freshness_hours: int | None = None) -> str:
-    """Unified search: DDG â†’ Tavily â†’ Exa fallback. Returns formatted text with source citations."""
+    """Unified search: DDG → Tavily → Exa fallback. Returns formatted text with source citations."""
     from core.search import search as search_module_fn
     return search_module_fn(query, max_results=max_results, freshness_hours=freshness_hours)
 
@@ -120,26 +120,26 @@ def knowledge_search(query: str, _topic: str = "") -> str:
     normalized = (query or "").strip().lower()
     entries = {
         "python": (
-            "Python lÃ  má»™t ngÃ´n ngá»¯ láº­p trÃ¬nh báº­c cao, thÃ´ng dá»‹ch, Ä‘a má»¥c Ä‘Ã­ch, ná»•i báº­t nhá» cÃº phÃ¡p dá»… Ä‘á»c "
-            "vÃ  há»‡ sinh thÃ¡i thÆ° viá»‡n ráº¥t lá»›n. Python thÆ°á»ng Ä‘Æ°á»£c dÃ¹ng trong phÃ¡t triá»ƒn web, tá»± Ä‘á»™ng hÃ³a, "
-            "khoa há»c dá»¯ liá»‡u, trÃ­ tuá»‡ nhÃ¢n táº¡o, giÃ¡o dá»¥c láº­p trÃ¬nh vÃ  viáº¿t script há»‡ thá»‘ng."
+            "Python là một ngôn ngữ lập trình bậc cao, thông dịch, đa mục đích, nổi bật nhờ cú pháp dễ đọc "
+            "và hệ sinh thái thư viện rất lớn. Python thường được dùng trong phát triển web, tự động hóa, "
+            "khoa học dữ liệu, trí tuệ nhân tạo, giáo dục lập trình và viết script hệ thống."
         ),
-        "hÃ  ná»™i": (
-            "HÃ  Ná»™i lÃ  thá»§ Ä‘Ã´ cá»§a Viá»‡t Nam, náº±m á»Ÿ khu vá»±c Äá»“ng báº±ng sÃ´ng Há»“ng vÃ  lÃ  trung tÃ¢m chÃ­nh trá»‹, "
-            "vÄƒn hÃ³a, giÃ¡o dá»¥c quan trá»ng cá»§a cáº£ nÆ°á»›c. ThÃ nh phá»‘ cÃ³ lá»‹ch sá»­ lÃ¢u Ä‘á»i vá»›i nhiá»u di tÃ­ch nhÆ° "
-            "HoÃ ng thÃ nh ThÄƒng Long, VÄƒn Miáº¿u - Quá»‘c Tá»­ GiÃ¡m vÃ  Há»“ GÆ°Æ¡m."
+        "hà nội": (
+            "Hà Nội là thủ đô của Việt Nam, nằm ở khu vực Đồng bằng sông Hồng và là trung tâm chính trị, "
+            "văn hóa, giáo dục quan trọng của cả nước. Thành phố có lịch sử lâu đời với nhiều di tích như "
+            "Hoàng thành Thăng Long, Văn Miếu - Quốc Tử Giám và Hồ Gươm."
         ),
         "albert einstein": (
-            "Albert Einstein lÃ  nhÃ  váº­t lÃ½ lÃ½ thuyáº¿t ná»•i tiáº¿ng, ngÆ°á»i phÃ¡t triá»ƒn thuyáº¿t tÆ°Æ¡ng Ä‘á»‘i háº¹p vÃ  "
-            "thuyáº¿t tÆ°Æ¡ng Ä‘á»‘i rá»™ng. CÃ´ng thá»©c E=mcÂ² cá»§a Einstein mÃ´ táº£ má»‘i liÃªn há»‡ giá»¯a khá»‘i lÆ°á»£ng vÃ  nÄƒng lÆ°á»£ng, "
-            "vÃ  Ã´ng nháº­n giáº£i Nobel Váº­t lÃ½ nÄƒm 1921 nhá» giáº£i thÃ­ch hiá»‡u á»©ng quang Ä‘iá»‡n."
+            "Albert Einstein là nhà vật lý lý thuyết nổi tiếng, người phát triển thuyết tương đối hẹp và "
+            "thuyết tương đối rộng. Công thức E=mc² của Einstein mô tả mối liên hệ giữa khối lượng và năng lượng, "
+            "và ông nhận giải Nobel Vật lý năm 1921 nhờ giải thích hiệu ứng quang điện."
         ),
-        "vinai": "VinAI lÃ  viá»‡n nghiÃªn cá»©u trÃ­ tuá»‡ nhÃ¢n táº¡o hÃ ng Ä‘áº§u táº¡i Viá»‡t Nam, táº­p trung vÃ o nghiÃªn cá»©u á»©ng dá»¥ng AI, thá»‹ giÃ¡c mÃ¡y tÃ­nh, xá»­ lÃ½ ngÃ´n ngá»¯ tá»± nhiÃªn vÃ  cÃ¡c sáº£n pháº©m cÃ´ng nghá»‡ thÃ´ng minh.",
+        "vinai": "VinAI là viện nghiên cứu trí tuệ nhân tạo hàng đầu tại Việt Nam, tập trung vào nghiên cứu ứng dụng AI, thị giác máy tính, xử lý ngôn ngữ tự nhiên và các sản phẩm công nghệ thông minh.",
     }
     for key, value in entries.items():
         if key in normalized:
             return value
-    return "KhÃ´ng tÃ¬m tháº¥y thÃ´ng tin trong cÆ¡ sá»Ÿ dá»¯ liá»‡u cá»¥c bá»™ cho chá»§ Ä‘á» nÃ y. Báº¡n cÃ³ thá»ƒ dÃ¹ng web_search Ä‘á»ƒ tra cá»©u nguá»“n cáº­p nháº­t hÆ¡n."
+    return "Không tìm thấy thông tin trong cơ sở dữ liệu cục bộ cho chủ đề này. Bạn có thể dùng web_search để tra cứu nguồn cập nhật hơn."
 
 
 def _currency_lookup_key(value: str) -> str:
@@ -250,11 +250,11 @@ def calculate(expression: str) -> str:
     """
     cleaned = expression.strip()
     if not cleaned:
-        return "KhÃ´ng thá»ƒ thá»±c hiá»‡n phÃ©p tÃ­nh: biá»ƒu thá»©c trá»‘ng."
+        return "Không thể thực hiện phép tính: biểu thức trống."
     try:
         allowed_chars = set("0123456789+-*/.%() ")
         if not all(c in allowed_chars for c in cleaned):
-            return "KhÃ´ng thá»ƒ thá»±c hiá»‡n phÃ©p tÃ­nh: biá»ƒu thá»©c khÃ´ng há»£p lá»‡."
+            return "Không thể thực hiện phép tính: biểu thức không hợp lệ."
         res = eval(cleaned, {"__builtins__": None}, {})
         if isinstance(res, float):
             res_str = f"{res:.3f}"
@@ -262,10 +262,10 @@ def calculate(expression: str) -> str:
             res_str = str(res)
         return f"{cleaned} = {res_str}"
     except Exception as e:
-        return f"KhÃ´ng thá»ƒ thá»±c hiá»‡n phÃ©p tÃ­nh: {str(e)}"
+        return f"Không thể thực hiện phép tính: {str(e)}"
 
 
-# â”€â”€ Generic retry + fallback wrapper â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Generic retry + fallback wrapper ─────────────────────────────────────────
 T = TypeVar("T")
 
 
@@ -294,10 +294,10 @@ def _safe_tool_call(
     if fallback is not None:
         return fallback  # type: ignore[return-value]
     name = tool_name or func.__name__
-    return f"Xin lá»—i, khÃ´ng thá»ƒ thá»±c hiá»‡n {name} lÃºc nÃ y. Vui lÃ²ng thá»­ láº¡i sau."  # type: ignore[return-value]
+    return f"Xin lỗi, không thể thực hiện {name} lúc này. Vui lòng thử lại sau."  # type: ignore[return-value]
 
 
-# â”€â”€ TTL Cache â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── TTL Cache ────────────────────────────────────────────────────────────────
 _cache_store: Dict[str, tuple[Any, float]] = {}
 _cache_lock = threading.Lock()
 
@@ -333,6 +333,49 @@ _session = requests.Session()
 _session.mount(HTTPS_SCHEME, _adapter)
 _session.mount(HTTP_SCHEME, _adapter)
 
+
+_EVIDENCE_TOTAL_TIMEOUT = 15  # hard ceiling (seconds) for ALL page-evidence fetches combined
+
+
+class _DaemonPoolExecutor(ThreadPoolExecutor):
+    """ThreadPoolExecutor whose worker threads are daemon threads.
+
+    A worker can get stuck in a blocking OS call (e.g. DNS resolution via
+    ``socket.getaddrinfo``) that no per-request timeout can interrupt. Daemon
+    workers keep such a hang from blocking the main thread or leaking a
+    non-daemon thread in a long-lived agent.
+    """
+
+    def _adjust_thread_count(self) -> None:
+        # Mirrors ThreadPoolExecutor._adjust_thread_count but spawns daemon threads.
+        if self._idle_semaphore.acquire(timeout=0):
+            return
+
+        import concurrent.futures.thread as _cft
+        import weakref
+
+        def weakref_cb(_, q=self._work_queue):
+            q.put(None)
+
+        num_threads = len(self._threads)
+        if num_threads < self._max_workers:
+            thread_name = "%s_%d" % (self._thread_name_prefix or self, num_threads)
+            t = threading.Thread(
+                name=thread_name,
+                target=_cft._worker,
+                args=(
+                    weakref.ref(self, weakref_cb),
+                    self._work_queue,
+                    self._initializer,
+                    self._initargs,
+                ),
+                daemon=True,
+            )
+            t.start()
+            self._threads.add(t)
+            _cft._threads_queues[t] = self._work_queue
+
+
 _REQUEST_TIMEOUT = 12  # seconds
 _TAVILY_SEARCH_URL = "https://api.tavily.com/search"
 _EXA_SEARCH_URL = "https://api.exa.ai/search"
@@ -342,24 +385,24 @@ _MIN_PRERERANK_K = 3
 _MAX_PRERERANK_K = 10
 
 WEATHER_CODE_MAP = {
-    0: "trá»i quang",
-    1: "Ã­t mÃ¢y",
-    2: "cÃ³ mÃ¢y",
-    3: "nhiá»u mÃ¢y",
-    45: "sÆ°Æ¡ng mÃ¹",
-    48: "sÆ°Æ¡ng mÃ¹ Ä‘Ã³ng bÄƒng",
-    51: "mÆ°a phÃ¹n nháº¹",
-    53: "mÆ°a phÃ¹n vá»«a",
-    55: "mÆ°a phÃ¹n dÃ y",
-    61: "mÆ°a nháº¹",
-    63: "mÆ°a vá»«a",
-    65: "mÆ°a to",
-    80: "mÆ°a rÃ o nháº¹",
-    81: "mÆ°a rÃ o vá»«a",
-    82: "mÆ°a rÃ o máº¡nh",
-    95: "dÃ´ng",
-    96: "dÃ´ng kÃ¨m mÆ°a Ä‘Ã¡ nháº¹",
-    99: "dÃ´ng kÃ¨m mÆ°a Ä‘Ã¡ máº¡nh",
+    0: "trời quang",
+    1: "ít mây",
+    2: "có mây",
+    3: "nhiều mây",
+    45: "sương mù",
+    48: "sương mù đóng băng",
+    51: "mưa phùn nhẹ",
+    53: "mưa phùn vừa",
+    55: "mưa phùn dày",
+    61: "mưa nhẹ",
+    63: "mưa vừa",
+    65: "mưa to",
+    80: "mưa rào nhẹ",
+    81: "mưa rào vừa",
+    82: "mưa rào mạnh",
+    95: "dông",
+    96: "dông kèm mưa đá nhẹ",
+    99: "dông kèm mưa đá mạnh",
 }
 
 _CITY_TIMEZONE_MAP = {
@@ -386,7 +429,7 @@ _CITY_TIMEZONE_MAP = {
     CITY_NEW_DELHI: "Asia/Kolkata",
     "Jakarta": "Asia/Jakarta",
     "Cairo": "Africa/Cairo",
-    # â”€â”€ Viá»‡t Nam cities â†’ Ä‘Ãºng timezone â”€â”€
+    # ── Việt Nam cities → đúng timezone ──
     "Hanoi": VN_TZ_NAME,
     "Ho Chi Minh City": VN_TZ_NAME,
     CITY_DA_NANG: VN_TZ_NAME,
@@ -406,12 +449,12 @@ def normalize_location(location: str) -> str:
     lower = cleaned.lower()
     # Remove common Vietnamese question suffixes
     trailing = [
-        "lÃ  bao nhiÃªu Ä‘á»™", "bao nhiÃªu Ä‘á»™", "lÃ  bao nhiÃªu",
-        "nhÆ° tháº¿ nÃ o", "tháº¿ nÃ o", "ra sao", "hÃ´m nay",
-        "ngÃ y mai", "hiá»‡n táº¡i", "bÃ¢y giá»", "lÃºc nÃ y",
-        "Ä‘ang lÃ  bao nhiÃªu", "Ä‘ang tháº¿ nÃ o", "Ä‘ang ra sao",
-        "cÃ³ mÆ°a khÃ´ng", "cÃ³ náº¯ng khÃ´ng", "cÃ³ giÃ³ khÃ´ng",
-        "nhiá»‡t Ä‘á»™", "thá»i tiáº¿t", "weather", "temperature",
+        "là bao nhiêu độ", "bao nhiêu độ", "là bao nhiêu",
+        "như thế nào", "thế nào", "ra sao", "hôm nay",
+        "ngày mai", "hiện tại", "bây giờ", "lúc này",
+        "đang là bao nhiêu", "đang thế nào", "đang ra sao",
+        "có mưa không", "có nắng không", "có gió không",
+        "nhiệt độ", "thời tiết", "weather", "temperature",
     ]
     for phrase in trailing:
         if lower.endswith(phrase):
@@ -423,72 +466,72 @@ def normalize_location(location: str) -> str:
 
     normalized = cleaned.lower()
     alias_map = {
-        # â”€â”€ Viá»‡t Nam â”€â”€
+        # ── Việt Nam ──
         "tphcm": _HCM,
         "tp hcm": _HCM,
         "tp.hcm": _HCM,
-        "tp há»“ chÃ­ minh": _HCM,
-        "thÃ nh phá»‘ há»“ chÃ­ minh": _HCM,
-        "thÃ nh phá»‘ há»“ chÃ­ minhh": _HCM,
-        "sÃ i gÃ²n": _HCM,
+        "tp hồ chí minh": _HCM,
+        "thành phố hồ chí minh": _HCM,
+        "thành phố hồ chí minhh": _HCM,
+        "sài gòn": _HCM,
         "sai gon": _HCM,
         "hcm": _HCM,
         "hcmc": _HCM,
-        "há»“ chÃ­ minhh": _HCM,
-        "hÃ  ná»™i": "Hanoi",
+        "hồ chí minhh": _HCM,
+        "hà nội": "Hanoi",
         "ha noi": "Hanoi",
-        "Ä‘Ã  náºµng": CITY_DA_NANG,
+        "đà nẵng": CITY_DA_NANG,
         "da nang": CITY_DA_NANG,
-        "huáº¿": "Hue",
+        "huế": "Hue",
         "hue": "Hue",
-        "cáº§n thÆ¡": CITY_CAN_THO,
+        "cần thơ": CITY_CAN_THO,
         "can tho": CITY_CAN_THO,
-        "háº£i phÃ²ng": CITY_HAI_PHONG,
+        "hải phòng": CITY_HAI_PHONG,
         "hai phong": CITY_HAI_PHONG,
         "nha trang": "Nha Trang",
-        "Ä‘Ã  láº¡t": CITY_DA_LAT,
+        "đà lạt": CITY_DA_LAT,
         "da lat": CITY_DA_LAT,
-        "vÅ©ng tÃ u": CITY_VUNG_TAU,
+        "vũng tàu": CITY_VUNG_TAU,
         "vung tau": CITY_VUNG_TAU,
-        "biÃªn hÃ²a": "Bien Hoa",
+        "biên hòa": "Bien Hoa",
         "bien hoa": "Bien Hoa",
-        "quy nhÆ¡n": "Quy Nhon",
+        "quy nhơn": "Quy Nhon",
         "quy nhon": "Quy Nhon",
-        "buÃ´n ma thuá»™t": "Buon Ma Thuot",
-        "bÃ¬nh dÆ°Æ¡ng": "Binh Duong",
+        "buôn ma thuột": "Buon Ma Thuot",
+        "bình dương": "Binh Duong",
         "long an": "Long An",
-        "thÃ¡i nguyÃªn": "Thai Nguyen",
-        "nam Ä‘á»‹nh": "Nam Dinh",
+        "thái nguyên": "Thai Nguyen",
+        "nam định": "Nam Dinh",
         "vinh": "Vinh",
-        "thanh hÃ³a": "Thanh Hoa",
-        "nghá»‡ an": "Nghe An",
-        "phÃº quá»‘c": "Phu Quoc",
+        "thanh hóa": "Thanh Hoa",
+        "nghệ an": "Nghe An",
+        "phú quốc": "Phu Quoc",
 
-        # â”€â”€ ChÃ¢u Ã â”€â”€
+        # ── Châu Á ──
         "tokyo": "Tokyo",
-        "Ä‘Ã´ng kinh": "Tokyo",
+        "đông kinh": "Tokyo",
         "osaka": "Osaka",
         "kyoto": "Kyoto",
-        "báº¯c kinh": "Beijing",
+        "bắc kinh": "Beijing",
         "bac kinh": "Beijing",
         "beijing": "Beijing",
-        "thÆ°á»£ng háº£i": "Shanghai",
+        "thượng hải": "Shanghai",
         "thuong hai": "Shanghai",
         "shanghai": "Shanghai",
-        "quáº£ng chÃ¢u": "Guangzhou",
+        "quảng châu": "Guangzhou",
         "quang chau": "Guangzhou",
-        "thÃ¢m quyáº¿n": "Shenzhen",
+        "thâm quyến": "Shenzhen",
         "tham quyen": "Shenzhen",
-        "há»“ng kÃ´ng": CITY_HONG_KONG,
+        "hồng kông": CITY_HONG_KONG,
         "hong kong": CITY_HONG_KONG,
-        "Ä‘Ã i báº¯c": "Taipei",
+        "đài bắc": "Taipei",
         "dai bac": "Taipei",
         "taipei": "Taipei",
         "seoul": "Seoul",
-        "xÆ¡ un": "Seoul",
+        "xơ un": "Seoul",
         "busan": "Busan",
         "bangkok": "Bangkok",
-        "bÄƒng cá»‘c": "Bangkok",
+        "băng cốc": "Bangkok",
         "bang coc": "Bangkok",
         "singapore": "Singapore",
         "xin ga po": "Singapore",
@@ -496,42 +539,42 @@ def normalize_location(location: str) -> str:
         "jakarta": "Jakarta",
         "manila": "Manila",
         "new delhi": CITY_NEW_DELHI,
-        "niu Ä‘Ãª li": CITY_NEW_DELHI,
+        "niu đê li": CITY_NEW_DELHI,
         "mumbai": "Mumbai",
         "phnom penh": "Phnom Penh",
-        "phnÃ´m pÃªnh": "Phnom Penh",
-        "viÃªng chÄƒn": "Vientiane",
+        "phnôm pênh": "Phnom Penh",
+        "viêng chăn": "Vientiane",
         "vientiane": "Vientiane",
         "yangon": "Yangon",
         "dubai": "Dubai",
 
-        # â”€â”€ ChÃ¢u Ã‚u â”€â”€
+        # ── Châu Âu ──
         "london": "London",
-        "luÃ¢n Ä‘Ã´n": "London",
+        "luân đôn": "London",
         "luan don": "London",
         "paris": "Paris",
         "pa ri": "Paris",
         "berlin": "Berlin",
-        "bÃ©c lin": "Berlin",
+        "béc lin": "Berlin",
         "bec lin": "Berlin",
         "madrid": "Madrid",
-        "ma Ä‘rÃ­t": "Madrid",
+        "ma đrít": "Madrid",
         "roma": "Rome",
         "rome": "Rome",
-        "la mÃ£": "Rome",
+        "la mã": "Rome",
         "amsterdam": "Amsterdam",
         "moscow": "Moscow",
-        "mÃ¡t xcÆ¡ va": "Moscow",
+        "mát xcơ va": "Moscow",
         "mat xco va": "Moscow",
-        "máº¡c tÆ° khoa": "Moscow",
+        "mạc tư khoa": "Moscow",
         "mac tu khoa": "Moscow",
         "vienna": "Vienna",
-        "viÃªn": "Vienna",
+        "viên": "Vienna",
         "zurich": "Zurich",
         "prague": "Prague",
         "praha": "Prague",
         "warsaw": "Warsaw",
-        "vÃ¡c sa va": "Warsaw",
+        "vác sa va": "Warsaw",
         "istanbul": "Istanbul",
         "athens": "Athens",
         "a ten": "Athens",
@@ -544,19 +587,19 @@ def normalize_location(location: str) -> str:
         "copenhagen": "Copenhagen",
         "brussels": "Brussels",
 
-        # â”€â”€ ChÃ¢u Má»¹ â”€â”€
+        # ── Châu Mỹ ──
         "new york": CITY_NEW_YORK,
-        "niu oÃ³c": CITY_NEW_YORK,
-        "niu Æ°á»›c": CITY_NEW_YORK,
-        "ná»¯u Æ°á»›c": CITY_NEW_YORK,
+        "niu oóc": CITY_NEW_YORK,
+        "niu ước": CITY_NEW_YORK,
+        "nữu ước": CITY_NEW_YORK,
         "nuu uoc": CITY_NEW_YORK,
         "los angeles": CITY_LOS_ANGELES,
         "la": CITY_LOS_ANGELES,
         "chicago": "Chicago",
-        "si ca gÃ´": "Chicago",
+        "si ca gô": "Chicago",
         "san francisco": "San Francisco",
         "washington": "Washington",
-        "hoa thá»‹nh Ä‘á»‘n": "Washington",
+        "hoa thịnh đốn": "Washington",
         "hoa thinh don": "Washington",
         "seattle": "Seattle",
         "miami": "Miami",
@@ -566,19 +609,19 @@ def normalize_location(location: str) -> str:
         "toronto": "Toronto",
         "vancouver": "Vancouver",
         "mexico city": "Mexico City",
-        "sÃ£o paulo": "Sao Paulo",
+        "são paulo": "Sao Paulo",
         "sao paulo": "Sao Paulo",
         "buenos aires": "Buenos Aires",
 
-        # â”€â”€ ChÃ¢u Äáº¡i DÆ°Æ¡ng â”€â”€
+        # ── Châu Đại Dương ──
         "sydney": "Sydney",
-        "xÃ­t ni": "Sydney",
+        "xít ni": "Sydney",
         "melbourne": "Melbourne",
         "auckland": "Auckland",
 
-        # â”€â”€ ChÃ¢u Phi â”€â”€
+        # ── Châu Phi ──
         "cairo": "Cairo",
-        "cai rÃ´": "Cairo",
+        "cai rô": "Cairo",
         "cape town": "Cape Town",
         "lagos": "Lagos",
         "nairobi": "Nairobi",
@@ -602,7 +645,7 @@ def geocode_location(location: str) -> Dict[str, Any]:
     data = response.json()
     results = data.get("results", [])
     if not results:
-        raise RuntimeError(f"KhÃ´ng tÃ¬m tháº¥y Ä‘á»‹a Ä‘iá»ƒm: {location}")
+        raise RuntimeError(f"Không tìm thấy địa điểm: {location}")
     return results[0]
 
 
@@ -611,7 +654,7 @@ def _get_weather_raw(location: str) -> str:
     clean_location = normalize_location(location)
     place = geocode_location(clean_location)
 
-    # â”€â”€ XÃ¡c Ä‘á»‹nh timezone cho thÃ nh phá»‘ â”€â”€
+    # ── Xác định timezone cho thành phố ──
     city_name = place.get("name", clean_location)
     tz_name = _CITY_TIMEZONE_MAP.get(clean_location,
               _CITY_TIMEZONE_MAP.get(city_name, VN_TZ_NAME))
@@ -639,10 +682,10 @@ def _get_weather_raw(location: str) -> str:
         for item in [place.get("name"), place.get("admin1"), place.get("country")]
         if item
     )
-    weather_text = WEATHER_CODE_MAP.get(current.get("weather_code"), "khÃ´ng rÃµ")
-    daily_weather = WEATHER_CODE_MAP.get(daily_code, "khÃ´ng rÃµ")
+    weather_text = WEATHER_CODE_MAP.get(current.get("weather_code"), "không rõ")
+    daily_weather = WEATHER_CODE_MAP.get(daily_code, "không rõ")
 
-    # â”€â”€ Hiá»ƒn thá»‹ giá» LOCAL cá»§a thÃ nh phá»‘ Ä‘Ã³ â”€â”€
+    # ── Hiển thị giờ LOCAL của thành phố đó ──
     try:
         local_tz = zoneinfo.ZoneInfo(tz_name)
     except Exception:
@@ -652,28 +695,28 @@ def _get_weather_raw(location: str) -> str:
     tz_label = tz_name.split("/")[-1].replace("_", " ")
 
     return (
-        f"Thá»i tiáº¿t táº¡i {resolved} (cáº­p nháº­t lÃºc {time_str} giá» {tz_label}): "
-        f"hiá»‡n táº¡i trá»i {weather_text}, "
-        f"nhiá»‡t Ä‘á»™ {current.get('temperature_2m')}Â°C, "
-        f"cáº£m giÃ¡c nhÆ° {current.get('apparent_temperature')}Â°C, "
-        f"Ä‘á»™ áº©m {current.get('relative_humidity_2m')}%, "
-        f"giÃ³ {current.get('wind_speed_10m')} km/h, "
-                f"lÆ°á»£ng mÆ°a {current.get('precipitation')} mm. "
-        f"Dá»± bÃ¡o hÃ´m nay: {daily_weather}, "
-        f"tháº¥p nháº¥t {daily.get('temperature_2m_min', [None])[0]}Â°C, "
-        f"cao nháº¥t {daily.get('temperature_2m_max', [None])[0]}Â°C, "
-        f"kháº£ nÄƒng mÆ°a {daily.get('precipitation_probability_max', [None])[0]}%."
+        f"Thời tiết tại {resolved} (cập nhật lúc {time_str} giờ {tz_label}): "
+        f"hiện tại trời {weather_text}, "
+        f"nhiệt độ {current.get('temperature_2m')}°C, "
+        f"cảm giác như {current.get('apparent_temperature')}°C, "
+        f"độ ẩm {current.get('relative_humidity_2m')}%, "
+        f"gió {current.get('wind_speed_10m')} km/h, "
+                f"lượng mưa {current.get('precipitation')} mm. "
+        f"Dự báo hôm nay: {daily_weather}, "
+        f"thấp nhất {daily.get('temperature_2m_min', [None])[0]}°C, "
+        f"cao nhất {daily.get('temperature_2m_max', [None])[0]}°C, "
+        f"khả năng mưa {daily.get('precipitation_probability_max', [None])[0]}%."
     )
 
 
 def get_weather(location: str) -> str:
-    """Láº¥y thá»i tiáº¿t hiá»‡n táº¡i vÃ  dá»± bÃ¡o hÃ´m nay theo Ä‘á»‹a Ä‘iá»ƒm.
+    """Lấy thời tiết hiện tại và dự báo hôm nay theo địa điểm.
 
     Args:
-        location: TÃªn thÃ nh phá»‘ hoáº·c Ä‘á»‹a Ä‘iá»ƒm cáº§n láº¥y thá»i tiáº¿t.
+        location: Tên thành phố hoặc địa điểm cần lấy thời tiết.
 
     Returns:
-        Chuá»—i mÃ´ táº£ thá»i tiáº¿t báº±ng tiáº¿ng Viá»‡t.
+        Chuỗi mô tả thời tiết bằng tiếng Việt.
     """
     cache_key = f"weather:{normalize_location(location).lower()}"
     return _cached(
@@ -681,16 +724,16 @@ def get_weather(location: str) -> str:
         lambda: _safe_tool_call(
             _get_weather_raw, location,
             retries=1, delay=0.5,
-            fallback=f"KhÃ´ng thá»ƒ láº¥y dá»¯ liá»‡u thá»i tiáº¿t cho {location} lÃºc nÃ y. Vui lÃ²ng thá»­ láº¡i sau.",
+            fallback=f"Không thể lấy dữ liệu thời tiết cho {location} lúc này. Vui lòng thử lại sau.",
             tool_name="get_weather",
         ),
-        ttl_seconds=600,  # cache 10 phÃºt
+        ttl_seconds=600,  # cache 10 phút
     )
 
 
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# ══════════════════════════════════════════════════════════════════════════════
 # HTML / SNIPPET UTILITIES
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# ══════════════════════════════════════════════════════════════════════════════
 
 def strip_html_tags(raw_html: str) -> str:
     """Strip HTML tags and normalize whitespace."""
@@ -703,8 +746,8 @@ def strip_html_tags(raw_html: str) -> str:
 _BOILERPLATE_SNIPPET_MARKERS = [
     "cookie",
     "privacy",
-    "Ä‘iá»u khoáº£n",
-    "Ä‘Äƒng nháº­p",
+    "điều khoản",
+    "đăng nhập",
     "sign in",
     "all rights reserved",
     "subscribe",
@@ -724,72 +767,72 @@ def _is_boilerplate_snippet(text: str) -> bool:
 # These are common meta-text phrases that add no informational value
 _SNIPPET_BOILERPLATE_PATTERNS = [
     # Time/meta stamps (full sentence)
-    r"(?i)(bÃ i viáº¿t|báº£n tin|tin tá»©c|thÃ´ng tin)\s+(Ä‘Æ°á»£c\s+)?(Ä‘Äƒng|cáº­p nháº­t|cÃ´ng bá»‘|chia sáº»)\s+(vÃ o lÃºc|lÃºc|ngÃ y|tá»«|vÃ o)\s+[\d:\-/.,\s]+",
-    r"(?i)(Ä‘Äƒng|cáº­p nháº­t|cÃ´ng bá»‘)\s+(lÃºc|vÃ o lÃºc|ngÃ y)\s+[\d:\-/.,\s]+",
-    # Author byline + timestamp: "DÅ©ng Huá»³nh 26/05/2026, 18:43" or "TÃªn TÃ¡c Giáº£ DD/MM/YYYY HH:MM"
+    r"(?i)(bài viết|bản tin|tin tức|thông tin)\s+(được\s+)?(đăng|cập nhật|công bố|chia sẻ)\s+(vào lúc|lúc|ngày|từ|vào)\s+[\d:\-/.,\s]+",
+    r"(?i)(đăng|cập nhật|công bố)\s+(lúc|vào lúc|ngày)\s+[\d:\-/.,\s]+",
+    # Author byline + timestamp: "Dũng Huỳnh 26/05/2026, 18:43" or "Tên Tác Giả DD/MM/YYYY HH:MM"
     # Only match 2 capitalized words immediately followed by date+time (not longer sequences)
-    r"(?i)(?:^|(?<=\s))(?:[A-ZÃ€-á»¸][a-zÃ -á»¹]+\s+)[A-ZÃ€-á»¸][a-zÃ -á»¹]+\s+\d{1,2}[/\.]\d{1,2}[/\.]\d{4}\s*[,\.]?\s*\d{1,2}:\d{2}",
-    # Section label with count: "0 Thá»i sá»±", "5 BÃ¬nh luáº­n"
-    r"(?i)\b\d+\s+(thá»i sá»±|kinh táº¿|thá»ƒ thao|giáº£i trÃ­|tháº¿ giá»›i|phÃ¡p luáº­t|sá»©c khá»e|giÃ¡o dá»¥c|cÃ´ng nghá»‡|du lá»‹ch|xe|Ä‘á»i sá»‘ng)\b",
-    # Discussion prompt with count: "CÃ¹ng luáº­n bÃ n 0"
-    r"(?i)(cÃ¹ng\s+luáº­n\s+bÃ n|tháº£o\s+luáº­n|bÃ n\s+luáº­n)\s+\d+",
+    r"(?i)(?:^|(?<=\s))(?:[A-ZÀ-Ỹ][a-zà-ỹ]+\s+)[A-ZÀ-Ỹ][a-zà-ỹ]+\s+\d{1,2}[/\.]\d{1,2}[/\.]\d{4}\s*[,\.]?\s*\d{1,2}:\d{2}",
+    # Section label with count: "0 Thời sự", "5 Bình luận"
+    r"(?i)\b\d+\s+(thời sự|kinh tế|thể thao|giải trí|thế giới|pháp luật|sức khỏe|giáo dục|công nghệ|du lịch|xe|đời sống)\b",
+    # Discussion prompt with count: "Cùng luận bàn 0"
+    r"(?i)(cùng\s+luận\s+bàn|thảo\s+luận|bàn\s+luận)\s+\d+",
     # Author role labels
-    r"(?i)\b(NhÃ \s+bÃ¡o|PV|PhÃ³ng\s+viÃªn|NhÃ \s+ngoáº¡i\s+giao|ChuyÃªn\s+gia|Tiáº¿n\s+sá»¹|GiÃ¡o\s+sÆ°)\b",
-    r"(?i)vÃ \s+\d+\s+tÃ¡c\s+giáº£\s+khÃ¡c",
+    r"(?i)\b(Nhà\s+báo|PV|Phóng\s+viên|Nhà\s+ngoại\s+giao|Chuyên\s+gia|Tiến\s+sỹ|Giáo\s+sư)\b",
+    r"(?i)và\s+\d+\s+tác\s+giả\s+khác",
     # Source labels
-    r"(?i)(theo\s+ghi\s+nháº­n\s+cá»§a|theo\s+bÃ¡o\s+cÃ¡o|theo\s+Ä‘Ã¡nh\s+giÃ¡|theo\s+thá»‘ng\s+kÃª)",
-    # Filler intro: "ÄÃ¢y lÃ  X Ä‘Ã¡ng chÃºÃ½/quan trá»ng..." (allow any words between type and adjective)
-    r"(?i)Ä‘Ã¢y lÃ \s+(káº¿t quáº£|thÃ´ng tin|nhÃ³m thÃ´ng tin|nhÃ³m tráº­n|bÃ i viáº¿t|báº£n tin|tin tá»©c|ná»™i dung|Ä‘iá»ƒm nháº¥n|khung giá»|tráº­n)\s+.*?(ná»•i báº­t|Ä‘Ã¡ng chÃº Ã½|quan trá»ng|má»›i nháº¥t|chÃ­nh|má»›i Ä‘Æ°á»£c cáº­p nháº­t|dÃ nh cho|vÃ¬|cÃ³)",
-    r"(?i)(ná»™i dung|bÃ i viáº¿t|báº£n tin)\s+(bÃ i\s+)?(nÃ y|viáº¿t)\s+(cung cáº¥p|táº­p trung|Ä‘á» cáº­p|nÃ³i|chia sáº»|cáº­p nháº­t)\s+(thÃ´ng tin\s+)?(vá»|cho|liÃªn quan)",
-    r"(?i)ná»™i dung\s+bÃ i\s+viáº¿t\s+(cung cáº¥p|táº­p trung|Ä‘á» cáº­p|chia sáº»|cho biáº¿t)",
+    r"(?i)(theo\s+ghi\s+nhận\s+của|theo\s+báo\s+cáo|theo\s+đánh\s+giá|theo\s+thống\s+kê)",
+    # Filler intro: "Đây là X đáng chúý/quan trọng..." (allow any words between type and adjective)
+    r"(?i)đây là\s+(kết quả|thông tin|nhóm thông tin|nhóm trận|bài viết|bản tin|tin tức|nội dung|điểm nhấn|khung giờ|trận)\s+.*?(nổi bật|đáng chú ý|quan trọng|mới nhất|chính|mới được cập nhật|dành cho|vì|có)",
+    r"(?i)(nội dung|bài viết|bản tin)\s+(bài\s+)?(này|viết)\s+(cung cấp|tập trung|đề cập|nói|chia sẻ|cập nhật)\s+(thông tin\s+)?(về|cho|liên quan)",
+    r"(?i)nội dung\s+bài\s+viết\s+(cung cấp|tập trung|đề cập|chia sẻ|cho biết)",
     # Content focus meta
-    r"(?i)(ná»™i dung|bÃ i viáº¿t|báº£n tin)\s+(táº­p trung|chá»§ yáº¿u)\s+(vÃ o\s+)?(viá»‡c\s+)?(tá»•ng há»£p|náº¯m nhanh|cung cáº¥p|Ä‘Æ°a tin|tÃ³m táº¯t)\s+[^\.\,]*",
+    r"(?i)(nội dung|bài viết|bản tin)\s+(tập trung|chủ yếu)\s+(vào\s+)?(việc\s+)?(tổng hợp|nắm nhanh|cung cấp|đưa tin|tóm tắt)\s+[^\.\,]*",
     # Filler outro phrases (full sentence)
-    r"(?i)(Ä‘á»ƒ biáº¿t thÃªm chi tiáº¿t|xem thÃªm|Ä‘á»c thÃªm|má»i báº¡n Ä‘á»c|cÃ¡c báº¡n cÃ³ thá»ƒ)\s+[^\.\,]*",
-    r"(?i)(theo dÃµi|Ä‘Ã³n Ä‘á»c)\s+(thÃªm|tiáº¿p|trÃªn)\s+[^\.\,]*",
+    r"(?i)(để biết thêm chi tiết|xem thêm|đọc thêm|mời bạn đọc|các bạn có thể)\s+[^\.\,]*",
+    r"(?i)(theo dõi|đón đọc)\s+(thêm|tiếp|trên)\s+[^\.\,]*",
     # Vague result intro (full sentence, no specific facts)
-    r"(?i)(ghi nháº­n|cho tháº¥y|Ä‘Ã¡ng chÃº Ã½|ná»•i báº­t)\s+(nhiá»u\s+)?(káº¿t quáº£|diá»…n biáº¿n|thÃ´ng tin|thay Ä‘á»•i|tÃ¡c Ä‘á»™ng)\s+(Ä‘Ã¡ng chÃº Ã½|quan trá»ng|ná»•i báº­t|má»›i)",
-    r"(?i)(loáº¡t|chuá»—i|nhiá»u)\s+(tráº­n|káº¿t quáº£|diá»…n biáº¿n|tin tá»©c|thÃ´ng tin)\s+(Ä‘Æ°á»£c\s+)?(cáº­p nháº­t|ghi nháº­n|diá»…n ra)\s+(trong|á»Ÿ|vÃ o)\s+(ngÃ y|Ä‘Ãªm|ráº¡ng sÃ¡ng|sÃ¡ng)",
-    r"(?i)(loáº¡t|chuá»—i|nhiá»u)\s+(tráº­n|káº¿t quáº£|diá»…n biáº¿n|tin tá»©c|thÃ´ng tin)\s+.*?(cÃ³|ghi nháº­n)\s+nhiá»u\s+(káº¿t quáº£|diá»…n biáº¿n|tin tá»©c)\s+(Ä‘Ã¡ng chÃº Ã½|ná»•i báº­t|quan trá»ng)",
+    r"(?i)(ghi nhận|cho thấy|đáng chú ý|nổi bật)\s+(nhiều\s+)?(kết quả|diễn biến|thông tin|thay đổi|tác động)\s+(đáng chú ý|quan trọng|nổi bật|mới)",
+    r"(?i)(loạt|chuỗi|nhiều)\s+(trận|kết quả|diễn biến|tin tức|thông tin)\s+(được\s+)?(cập nhật|ghi nhận|diễn ra)\s+(trong|ở|vào)\s+(ngày|đêm|rạng sáng|sáng)",
+    r"(?i)(loạt|chuỗi|nhiều)\s+(trận|kết quả|diễn biến|tin tức|thông tin)\s+.*?(có|ghi nhận)\s+nhiều\s+(kết quả|diễn biến|tin tức)\s+(đáng chú ý|nổi bật|quan trọng)",
     # Market/intro meta
-    r"(?i)(thá»‹ trÆ°á»ng|lÃ ng\s+chuyá»ƒn\s+nhÆ°á»£ng)\s+.*?(ghi nháº­n|cÃ³|tháº¥y)\s+nhiá»u\s+(tin|diá»…n biáº¿n|thÃ´ng tin)\s+(Ä‘Ã¡ng chÃº Ã½|ná»•i báº­t|quan trá»ng|nÃ³ng)\s+(liÃªn quan|liÃªn quan Ä‘áº¿n|vá»)",
+    r"(?i)(thị trường|làng\s+chuyển\s+nhượng)\s+.*?(ghi nhận|có|thấy)\s+nhiều\s+(tin|diễn biến|thông tin)\s+(đáng chú ý|nổi bật|quan trọng|nóng)\s+(liên quan|liên quan đến|về)",
     # Generic news boilerplate (full sentence)
-    r"(?i)(trang tin|kÃªnh tin tá»©c|bÃ¡o Ä‘iá»‡n tá»­)\s+(cáº­p nháº­t|cung cáº¥p|Ä‘Æ°a tin)\s+(nhanh chÃ³ng|liÃªn tá»¥c|newest|24h)",
-    r"(?i)(thÃ´ng tin|tin tá»©c)\s+(trÃªn|tá»«|cá»§a)\s+\w+\s+(cho biáº¿t|cho hay|viáº¿t|Ä‘Äƒng táº£i)",
+    r"(?i)(trang tin|kênh tin tức|báo điện tử)\s+(cập nhật|cung cấp|đưa tin)\s+(nhanh chóng|liên tục|newest|24h)",
+    r"(?i)(thông tin|tin tức)\s+(trên|từ|của)\s+\w+\s+(cho biết|cho hay|viết|đăng tải)",
     # Source attribution repeated at end (already cited in SOURCE field)
     r"(?i)\(theo\s+[^)]+\)\s*$",
     # Redundant meta descriptions (full sentence)
-    r"(?i)(tá»•ng há»£p|Ä‘iá»ƒm tin|Ä‘iá»ƒm bÃ¡o|báº£n tin)\s+(tá»«|cÃ¡c|trÃªn)\s+[^\.\,]*",
+    r"(?i)(tổng hợp|điểm tin|điểm báo|bản tin)\s+(từ|các|trên)\s+[^\.\,]*",
     # Self-referential LLM-style meta commentary (full sentence)
-    r"(?i)(Ä‘Ã¢y lÃ |ná»™i dung nÃ y)\s+(thÃ´ng tin|káº¿t quáº£|báº£n tin|bÃ i viáº¿t|dá»¯ liá»‡u)\s+(liÃªn quan|thuá»™c|phÃ¹ há»£p|quan trá»ng)\s+(vá»›i|cho|vá»|Ä‘áº¿n)",
-    # Category nav sequences: "Kinh doanh TiÃªu dÃ¹ng Thá»© hai, 01/06/2026 - 09:00 :"
-    r"(?i)^(kinh doanh|tiÃªu dÃ¹ng|thá»i sá»±|trong nÆ°á»›c|quá»‘c táº¿|thá»ƒ thao|giáº£i trÃ­|sá»©c khá»e|Ä‘á»i sá»‘ng|giÃ¡o dá»¥c|vÄƒn hÃ³a|phÃ¡p luáº­t)(?:\s+(kinh doanh|tiÃªu dÃ¹ng|thá»i sá»±|trong nÆ°á»›c|quá»‘c táº¿|thá»ƒ thao|giáº£i trÃ­|sá»©c khá»e|Ä‘á»i sá»‘ng|giÃ¡o dá»¥c|vÄƒn hÃ³a|phÃ¡p luáº­t))*\s+(thá»©\s+[hai|ba|bá»‘n|nÄƒm|sÃ¡u|báº£y|cn]|monday|tuesday|wednesday|thursday|friday|saturday|sunday)\s*,?\s*\d{1,2}[/\.]\d{1,2}[/\.]\d{4}\s*[-â€“â€”:]+\s*\d{1,2}:\d{2}",
-    # Broken sentence fragments: "Táº¡i sá»‘ ChatToday hÃ´m nay cá»§a bÃ¡o ."
-    r"(?i)^(táº¡i\s+|trong\s+sá»‘|á»Ÿ\s+|vá»\s+|cá»§a\s+)\w+\s+hÃ´m\s+nay\s+cá»§a\s+bÃ¡o\s*\.?\s*$",
-    r"(?i)^\w+\s+\(\w+\)\s*[-â€“â€”:]\s*$",  # "(DÃ¢n trÃ­) -" standalone
+    r"(?i)(đây là|nội dung này)\s+(thông tin|kết quả|bản tin|bài viết|dữ liệu)\s+(liên quan|thuộc|phù hợp|quan trọng)\s+(với|cho|về|đến)",
+    # Category nav sequences: "Kinh doanh Tiêu dùng Thứ hai, 01/06/2026 - 09:00 :"
+    r"(?i)^(kinh doanh|tiêu dùng|thời sự|trong nước|quốc tế|thể thao|giải trí|sức khỏe|đời sống|giáo dục|văn hóa|pháp luật)(?:\s+(kinh doanh|tiêu dùng|thời sự|trong nước|quốc tế|thể thao|giải trí|sức khỏe|đời sống|giáo dục|văn hóa|pháp luật))*\s+(thứ\s+[hai|ba|bốn|năm|sáu|bảy|cn]|monday|tuesday|wednesday|thursday|friday|saturday|sunday)\s*,?\s*\d{1,2}[/\.]\d{1,2}[/\.]\d{4}\s*[-–—:]+\s*\d{1,2}:\d{2}",
+    # Broken sentence fragments: "Tại số ChatToday hôm nay của báo ."
+    r"(?i)^(tại\s+|trong\s+số|ở\s+|về\s+|của\s+)\w+\s+hôm\s+nay\s+của\s+báo\s*\.?\s*$",
+    r"(?i)^\w+\s+\(\w+\)\s*[-–—:]\s*$",  # "(Dân trí) -" standalone
 ]
 
 # Substring patterns for in-sentence boilerplate prefix removal
 _SNIPPET_BOILERPLATE_PREFIX_PATTERNS = [
     # Leading > artifact (blockquote or navigation marker)
     (r"(?i)^>\s*", ""),
-    # Transition + meta intro: "NgoÃ i ra, báº£n tin X Ä‘á» cáº­p viá»‡c " -> keep content after "viá»‡c "
-    (r"(?i)^(ngoÃ i ra|bÃªn cáº¡nh Ä‘Ã³|cÃ¹ng vá»›i Ä‘Ã³|Ä‘á»“ng thá»i)\s*[,;]?\s*(báº£n tin|tin tá»©c|thÃ´ng tin|loáº¡t tin)\s+.*?(Ä‘á» cáº­p|nháº¯c tá»›i|nÃ³i vá»|cho biáº¿t|Ä‘Æ°a tin)\s+(viá»‡c\s+|vá»\s+|thÃªm\s+)?", ""),
-    # Meta intro: "Báº£n tin X cho biáº¿t " -> keep content after
-    (r"(?i)^(báº£n tin|tin tá»©c|loáº¡t tin|thÃ´ng tin)\s+.*?(cho biáº¿t|cho hay|viáº¿t|Ä‘Äƒng táº£i|cáº­p nháº­t|Ä‘á» cáº­p|nÃ³i)\s+(:\s+|ráº±ng\s+|viá»‡c\s+)?", ""),
+    # Transition + meta intro: "Ngoài ra, bản tin X đề cập việc " -> keep content after "việc "
+    (r"(?i)^(ngoài ra|bên cạnh đó|cùng với đó|đồng thời)\s*[,;]?\s*(bản tin|tin tức|thông tin|loạt tin)\s+.*?(đề cập|nhắc tới|nói về|cho biết|đưa tin)\s+(việc\s+|về\s+|thêm\s+)?", ""),
+    # Meta intro: "Bản tin X cho biết " -> keep content after
+    (r"(?i)^(bản tin|tin tức|loạt tin|thông tin)\s+.*?(cho biết|cho hay|viết|đăng tải|cập nhật|đề cập|nói)\s+(:\s+|rằng\s+|việc\s+)?", ""),
 ]
 
 # Substring patterns for in-sentence boilerplate suffix removal
 # These match trailing meta phrases that should be stripped from end of sentence
 _SNIPPET_BOILERPLATE_SUFFIX_PATTERNS = [
-    # Time window meta at end of sentence: ", váº«n náº±m trong khung 48 giá» gáº§n nháº¥t so vá»›i hiá»‡n táº¡i."
-    (r"(?i)\s*[,;]\s*(váº«n|náº±m|thuá»™c)\s+(náº±m\s+)?(trong|á»Ÿ|á»Ÿ trong)\s+(khung|khoáº£ng|pháº¡m vi)\s+\d+\s*(giá»|phÃºt|ngÃ y|tuáº§n)\s+(gáº§n nháº¥t|má»›i nháº¥t|qua|trÆ°á»›c|hiá»‡n táº¡i)\s*(so vá»›i hiá»‡n táº¡i)?\s*\.?\s*$", "."),
+    # Time window meta at end of sentence: ", vẫn nằm trong khung 48 giờ gần nhất so với hiện tại."
+    (r"(?i)\s*[,;]\s*(vẫn|nằm|thuộc)\s+(nằm\s+)?(trong|ở|ở trong)\s+(khung|khoảng|phạm vi)\s+\d+\s*(giờ|phút|ngày|tuần)\s+(gần nhất|mới nhất|qua|trước|hiện tại)\s*(so với hiện tại)?\s*\.?\s*$", "."),
     # Vague relevance/importance at end
-    (r"(?i)\s*[,;]\s*(vÃ¬|do|nÃªn)\s+(liÃªn quan|thuá»™c|phÃ¹ há»£p|quan trá»ng|áº£nh hÆ°á»Ÿng)\s+(trá»±c tiáº¿p\s+)?(Ä‘áº¿n|vá»›i|cho)\s+[^\.\,]*\.?\s*$", "."),
-    # Meta commentary about content focus: ", ná»™i dung táº­p trung vÃ o viá»‡c..."
-    (r"(?i)\s*[,;]\s*(ná»™i dung|bÃ i viáº¿t|báº£n tin)\s+(táº­p trung|chá»§ yáº¿u)\s+(vÃ o\s+)?(viá»‡c\s+)?(tá»•ng há»£p|náº¯m nhanh|cung cáº¥p)\s+[^\.\,]*\.?\s*$", "."),
-    # "ÄÃ¢y lÃ  X Ä‘Ã¡ng chÃº Ã½ vá»›i..." at end
-    (r"(?i)\s*[,;]\s*Ä‘Ã¢y lÃ \s+(Ä‘iá»ƒm nháº¥n|tráº­n|thÃ´ng tin)\s+(Ä‘Ã¡ng chÃº Ã½|quan trá»ng|ná»•i báº­t)\s+(vá»›i|cho|cá»§a)\s+[^\.\,]*\.?\s*$", "."),
+    (r"(?i)\s*[,;]\s*(vì|do|nên)\s+(liên quan|thuộc|phù hợp|quan trọng|ảnh hưởng)\s+(trực tiếp\s+)?(đến|với|cho)\s+[^\.\,]*\.?\s*$", "."),
+    # Meta commentary about content focus: ", nội dung tập trung vào việc..."
+    (r"(?i)\s*[,;]\s*(nội dung|bài viết|bản tin)\s+(tập trung|chủ yếu)\s+(vào\s+)?(việc\s+)?(tổng hợp|nắm nhanh|cung cấp)\s+[^\.\,]*\.?\s*$", "."),
+    # "Đây là X đáng chú ý với..." at end
+    (r"(?i)\s*[,;]\s*đây là\s+(điểm nhấn|trận|thông tin)\s+(đáng chú ý|quan trọng|nổi bật)\s+(với|cho|của)\s+[^\.\,]*\.?\s*$", "."),
 ]
 
 # OPTIMIZATION 4: Pre-compile regex patterns for performance
@@ -811,7 +854,7 @@ def _clean_snippet_content(text: str) -> str:
     text = re.sub(r'^>\s+', '', text)
 
     # Step 0a: CRITICAL - Strip VOV weather widget content
-    # VOV injects: "HÃ  Ná»™i Äáº·t máº·c Ä‘á»‹nh Xem Cao Báº±ng Äáº·t máº·c Ä‘á»‹nh Xem..."
+    # VOV injects: "Hà Nội Đặt mặc định Xem Cao Bằng Đặt mặc định Xem..."
     # Must strip BEFORE other cleaning to avoid polluting the content
     text = _strip_vov_weather_widget(text)
     if not text or len(text) < 30:
@@ -822,91 +865,91 @@ def _clean_snippet_content(text: str) -> str:
         return text
 
     # Step 0b: CRITICAL - Remove image caption artifacts at START of content
-    # Pattern: "0 (áº¢nh: AP) Äá»£t táº¥n cÃ´ng..." â†’ "Äá»£t táº¥n cÃ´ng..."
-    text = re.sub(r'^(?:\d+\s+)+(?:\(áº¢nh:\s*\w+\)|\(\s*Photo:\s*[^)]*\))\s*', '', text)
-    # Pattern: "0 NgÆ°á»i dÃ¢n bÃ ng hoÃ ng..." â†’ "NgÆ°á»i dÃ¢n bÃ ng hoÃ ng..."
-    text = re.sub(r'^\d+\s+(?=[A-ZÃ€-á»¸])', '', text)
+    # Pattern: "0 (Ảnh: AP) Đợt tấn công..." → "Đợt tấn công..."
+    text = re.sub(r'^(?:\d+\s+)+(?:\(Ảnh:\s*\w+\)|\(\s*Photo:\s*[^)]*\))\s*', '', text)
+    # Pattern: "0 Người dân bàng hoàng..." → "Người dân bàng hoàng..."
+    text = re.sub(r'^\d+\s+(?=[A-ZÀ-Ỹ])', '', text)
     # Pattern: "1 of 4 | ..." or "(AP Photo/John) ..."
     text = re.sub(r'^\d+\s+of\s+\d+\s*\|?\s*', '', text)
     # Pattern: "Latest videos AP Top Stories June 2 ..." (AP junk header)
     text = re.sub(r'^(?:Latest videos\s+)?AP\s+Top\s+Stories\s+[A-Z][a-z]+\s+\d+\s*', '', text)
-    # Pattern: ", [monthFull] [day], [year] STARKE, Fla. (AP) â€” " (AP dateline junk)
-    text = re.sub(r'^,\s*[A-Z][a-z]+\s+\d+,\s*\d{4}\s+[A-Z][A-Z\s,]+\(AP\)\s*â€”\s*', '', text)
-    # Pattern: "Starke, Fla. (AP) â€” " (AP dateline without date)
-    text = re.sub(r'^[A-Z][a-z]+,\s*[A-Z]{2}\s+\(AP\)\s*â€”\s*', '', text)
+    # Pattern: ", [monthFull] [day], [year] STARKE, Fla. (AP) — " (AP dateline junk)
+    text = re.sub(r'^,\s*[A-Z][a-z]+\s+\d+,\s*\d{4}\s+[A-Z][A-Z\s,]+\(AP\)\s*—\s*', '', text)
+    # Pattern: "Starke, Fla. (AP) — " (AP dateline without date)
+    text = re.sub(r'^[A-Z][a-z]+,\s*[A-Z]{2}\s+\(AP\)\s*—\s*', '', text)
 
-    # Step 0b: Remove (áº¢nh: AP) / (Photo: ...) / (AP Photo/...) anywhere in text
-    text = re.sub(r'\s*\(áº¢nh:\s*\w+\)\s*', ' ', text)
-    text = re.sub(r'\s+áº¢NH:\s*[A-ZÃ€-á»¸A-Za-z0-9/ ._-]{2,40}\s+', ' ', text)
+    # Step 0b: Remove (Ảnh: AP) / (Photo: ...) / (AP Photo/...) anywhere in text
+    text = re.sub(r'\s*\(Ảnh:\s*\w+\)\s*', ' ', text)
+    text = re.sub(r'\s+ẢNH:\s*[A-ZÀ-ỸA-Za-z0-9/ ._-]{2,40}\s+', ' ', text)
     text = re.sub(r'\s*\(\s*(?:Photo|Image|AP\s+Photo|AFP|Reuters|Getty)[^)]*\)\s*', ' ', text)
 
     # Step 0c: Remove title duplication at start of content
-    # "Tin tá»©c tháº¿ giá»›i 2-6: Ã”ng Trump... Tin tá»©c tháº¿ giá»›i 2-6: Ã”ng Trump..."
+    # "Tin tức thế giới 2-6: Ông Trump... Tin tức thế giới 2-6: Ông Trump..."
     title_dup_pattern = r'^(.{5,80}?[:\s])\s*\1'
     text = re.sub(title_dup_pattern, r'\1', text, flags=re.IGNORECASE)
 
     # Step 0c: Replace bullet/separator artifacts with proper sentence breaks
-    # Sites often use Â· or â€¢ or | to separate snippets â†’ convert to periods
-    text = re.sub(r'\s*[Â·â€¢|]\s*', '. ', text)
+    # Sites often use · or • or | to separate snippets → convert to periods
+    text = re.sub(r'\s*[·•|]\s*', '. ', text)
 
     # Step 1: Remove standalone UI element text (not full sentences)
-    # Catches: "Chia sáº»", "Theo dÃµi", "0 Trá»Ÿ láº¡i chá»§ Ä‘á»", "BÃ¬nh luáº­n" etc.
+    # Catches: "Chia sẻ", "Theo dõi", "0 Trở lại chủ đề", "Bình luận" etc.
     text = re.sub(
-        r'(?i)\b(chia sáº»|theo dÃµi|trá»Ÿ láº¡i chá»§ Ä‘á»|bÃ¬nh luáº­n|chuyÃªn má»¥c|xem thÃªm|xem nhanh|Ä‘á»c nhanh|tÃ³m táº¯t nhanh|in bÃ i|gá»­i email|cá»¡ chá»¯|thá»i gian Ä‘á»c|Ä‘Äƒng kÃ½|like|follow)\b',
+        r'(?i)\b(chia sẻ|theo dõi|trở lại chủ đề|bình luận|chuyên mục|xem thêm|xem nhanh|đọc nhanh|tóm tắt nhanh|in bài|gửi email|cỡ chữ|thời gian đọc|đăng ký|like|follow)\b',
         ' ',
         text,
     )
-    # Remove standalone digits followed by UI text: "0 Trá»Ÿ láº¡i", "5 BÃ¬nh luáº­n"
-    text = re.sub(r'(?i)\d+\s+(trá»Ÿ láº¡i|bÃ¬nh luáº­n|chia sáº»|comment|share)\b', ' ', text)
-    # Remove section labels with count: "0 Thá»i sá»±", "5 BÃ¬nh luáº­n", "0 PhÃ¡t triá»ƒn"
-    text = re.sub(r'(?i)\b\d+\s+(thá»i sá»±|kinh táº¿|thá»ƒ thao|giáº£i trÃ­|tháº¿ giá»›i|phÃ¡p luáº­t|sá»©c khá»e|giÃ¡o dá»¥c|cÃ´ng nghá»‡|du lá»‹ch|xe|Ä‘á»i sá»‘ng|phÃ¡t triá»ƒn)\b', ' ', text)
-    # Remove discussion prompts: "CÃ¹ng luáº­n bÃ n 0"
-    text = re.sub(r'(?i)(cÃ¹ng\s+luáº­n\s+bÃ n|tháº£o\s+luáº­n|bÃ n\s+luáº­n)\s+\d+\b', ' ', text)
+    # Remove standalone digits followed by UI text: "0 Trở lại", "5 Bình luận"
+    text = re.sub(r'(?i)\d+\s+(trở lại|bình luận|chia sẻ|comment|share)\b', ' ', text)
+    # Remove section labels with count: "0 Thời sự", "5 Bình luận", "0 Phát triển"
+    text = re.sub(r'(?i)\b\d+\s+(thời sự|kinh tế|thể thao|giải trí|thế giới|pháp luật|sức khỏe|giáo dục|công nghệ|du lịch|xe|đời sống|phát triển)\b', ' ', text)
+    # Remove discussion prompts: "Cùng luận bàn 0"
+    text = re.sub(r'(?i)(cùng\s+luận\s+bàn|thảo\s+luận|bàn\s+luận)\s+\d+\b', ' ', text)
     # Remove author role labels
-    text = re.sub(r'(?i)\b(NhÃ \s+bÃ¡o|PV|PhÃ³ng\s+viÃªn|NhÃ \s+ngoáº¡i\s+giao|ChuyÃªn\s+gia|Tiáº¿n\s+sá»¹|GiÃ¡o\s+sÆ°|Thá»©\s+trÆ°á»Ÿng|Bá»™\s+trÆ°á»Ÿng)\b', ' ', text)
-    text = re.sub(r'(?i)vÃ \s+\d+\s+tÃ¡c\s+giáº£\s+khÃ¡c\b', ' ', text)
+    text = re.sub(r'(?i)\b(Nhà\s+báo|PV|Phóng\s+viên|Nhà\s+ngoại\s+giao|Chuyên\s+gia|Tiến\s+sỹ|Giáo\s+sư|Thứ\s+trưởng|Bộ\s+trưởng)\b', ' ', text)
+    text = re.sub(r'(?i)và\s+\d+\s+tác\s+giả\s+khác\b', ' ', text)
     # Remove source labels
-    text = re.sub(r'(?i)(theo\s+ghi\s+nháº­n\s+cá»§a|theo\s+bÃ¡o\s+cÃ¡o|theo\s+Ä‘Ã¡nh\s+giÃ¡|theo\s+thá»‘ng\s+káº¿)\s+', ' ', text)
-    # Remove ALL CAPS author names (2+ words): "NGá»ŒC AN", "Báº¢O NGá»ŒC", "NGUYá»„N VÄ‚N A"
-    # Use explicit uppercase class to avoid matching lowercase with diacritics (e.g. á»« is in Ã€-á»¸ range)
-    _UPPER = r'A-ZÃ€Ãáº¢Ãƒáº Ä‚áº®áº°áº²áº´áº¶Ã‚áº¤áº¦áº¨áºªáº¬ÄÃˆÃ‰áººáº¼áº¸ÃŠáº¾á»€á»‚á»„á»†ÃŒÃá»ˆÄ¨á»ŠÃ’Ã“á»ŽÃ•á»ŒÃ”á»á»’á»”á»–á»˜Æ á»šá»œá»žá» á»¢Ã™Ãšá»¦Å¨á»¤Æ¯á»¨á»ªá»¬á»®á»°á»²Ãá»¶á»¸á»´'
+    text = re.sub(r'(?i)(theo\s+ghi\s+nhận\s+của|theo\s+báo\s+cáo|theo\s+đánh\s+giá|theo\s+thống\s+kế)\s+', ' ', text)
+    # Remove ALL CAPS author names (2+ words): "NGỌC AN", "BẢO NGỌC", "NGUYỄN VĂN A"
+    # Use explicit uppercase class to avoid matching lowercase with diacritics (e.g. ừ is in À-Ỹ range)
+    _UPPER = r'A-ZÀÁẢÃẠĂẮẰẲẴẶÂẤẦẨẪẬĐÈÉẺẼẸÊẾỀỂỄỆÌÍỈĨỊÒÓỎÕỌÔỐỒỔỖỘƠỚỜỞỠỢÙÚỦŨỤƯỨỪỬỮỰỲÝỶỸỴ'
     text = re.sub(rf'\b[{_UPPER}]{{2,}}\s+[{_UPPER}][{_UPPER} ]*(?:\s+[{_UPPER}][{_UPPER} ]*)*\b', ' ', text)
-    # Remove author byline: "DÅ©ng Huá»³nh 26/05/2026, 18:43" or "NguyÃªn Nga - Quang Thuáº§n 01/06/2026 05:59"
+    # Remove author byline: "Dũng Huỳnh 26/05/2026, 18:43" or "Nguyên Nga - Quang Thuần 01/06/2026 05:59"
     # MUST run BEFORE timestamp removal, or the date+time anchor disappears
     # Pattern: dash-separated authors (multi-word names) followed by date+time
-    text = re.sub(r'[A-ZÃ€-á»¸][a-zÃ -á»¹]+(?:\s+[A-ZÃ€-á»¸][a-zÃ -á»¹]+)+\s*(?:[-â€“â€”]\s*[A-ZÃ€-á»¸][a-zÃ -á»¹]+(?:\s+[A-ZÃ€-á»¸][a-zÃ -á»¹]+)+)*\s+\d{1,2}[/\.]\d{1,2}[/\.]\d{4}\s*[,\.]?\s*\d{1,2}:\d{2}', ' ', text)
+    text = re.sub(r'[A-ZÀ-Ỹ][a-zà-ỹ]+(?:\s+[A-ZÀ-Ỹ][a-zà-ỹ]+)+\s*(?:[-–—]\s*[A-ZÀ-Ỹ][a-zà-ỹ]+(?:\s+[A-ZÀ-Ỹ][a-zà-ỹ]+)+)*\s+\d{1,2}[/\.]\d{1,2}[/\.]\d{4}\s*[,\.]?\s*\d{1,2}:\d{2}', ' ', text)
     # Pattern: single author (2 words) followed by date+time
-    text = re.sub(r'[A-ZÃ€-á»¸][a-zÃ -á»¹]+\s+[A-ZÃ€-á»¸][a-zÃ -á»¹]+\s+\d{1,2}[/\.]\d{1,2}[/\.]\d{4}\s*[,\.]?\s*\d{1,2}:\d{2}', ' ', text)
+    text = re.sub(r'[A-ZÀ-Ỹ][a-zà-ỹ]+\s+[A-ZÀ-Ỹ][a-zà-ỹ]+\s+\d{1,2}[/\.]\d{1,2}[/\.]\d{4}\s*[,\.]?\s*\d{1,2}:\d{2}', ' ', text)
     # Remove timestamps: "01/06/2026 09:07 GMT+7", "26/05/2026, 18:43"
     # FIX #3: Also remove parentheses-wrapped timestamps to avoid "( :00)" artifacts
     text = re.sub(r'\(\s*\d{1,2}[/\.]\d{1,2}(?:[/\.]\d{2,4})?\s*[,\.]?\s*\d{1,2}:\d{2}(?:\s*GMT\+?\d+)?\s*\)', ' ', text)
-    # FIX #3b: Also handle "( :00)" artifact â€” broken timestamp parse leaves "( :XX)"
+    # FIX #3b: Also handle "( :00)" artifact — broken timestamp parse leaves "( :XX)"
     text = re.sub(r'\(\s*:\d{2}\)', ' ', text)
     text = re.sub(r'\(\s*:00\s*\)', ' ', text)
     text = re.sub(r'\d{1,2}[/\.]\d{1,2}(?:[/\.]\d{2,4})?\s*[,\.]?\s*\d{1,2}:\d{2}(?:\s*GMT\+?\d+)?', ' ', text)
     # Remove leftover "GMT+7" / "GMT+8" if timestamp was partially matched
     text = re.sub(r'\bGMT\+\d+\b', ' ', text)
     # Remove media company names that appear as artifacts: "NKKTech Global Media April 17, 2026"
-    text = re.sub(r'(?i)\b(?:NKKTech|Global Media|Associated Press|Agence France-Presse|Reuters|Bloomberg|TechCrunch|The Verge|CNN|BBC|VnExpress|Tuá»•i Tráº»|DÃ¢n TrÃ­|VietnamNet|Thanh NiÃªn)\s+(?:April|May|June|July|August|September|October|November|December|January|February|March|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec|thÃ¡ng)\s+\d{1,2},?\s+\d{4}', ' ', text)
+    text = re.sub(r'(?i)\b(?:NKKTech|Global Media|Associated Press|Agence France-Presse|Reuters|Bloomberg|TechCrunch|The Verge|CNN|BBC|VnExpress|Tuổi Trẻ|Dân Trí|VietnamNet|Thanh Niên)\s+(?:April|May|June|July|August|September|October|November|December|January|February|March|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec|tháng)\s+\d{1,2},?\s+\d{4}', ' ', text)
     # Remove newspaper names used as source labels at END of content
-    # Matches: "...Thanh NiÃªn, Ä‘áº¿n ngÃ y 31.5." or "...BÃ¡o Má»›i, ngÃ y 1/6"
-    text = re.sub(r'[\s,]+(?:Thanh\s*NiÃªn|Tuá»•i\s*Tráº»|VnExpress|DÃ¢n\s*TrÃ­|Lao\s*Äá»™ng|Tiá»n\s*Phong)\s*(?:,\s*(?:Ä‘áº¿n\s+)?ngÃ y\s+\d{1,2}[/\.]?\d{0,2}\.?)?\s*$', ' ', text, flags=re.IGNORECASE)
-    # Remove markdown artifacts: "*Viá»‡t Nam", "-19 Boys'"
-    text = re.sub(r'[*\-]\s*([A-ZÃ€-á»¸])', r'\1', text)
-    # Fix markdown-damaged alphanumeric tokens: "-19" â†’ "U19", "-2" â†’ "U2"
-    text = re.sub(r'(?i)(?:^|(?<=\s))[-â€“â€”]\s*(\d{1,2}\s*(?:boy|girl|team|u\d|giáº£i))', r'U\1', text)
+    # Matches: "...Thanh Niên, đến ngày 31.5." or "...Báo Mới, ngày 1/6"
+    text = re.sub(r'[\s,]+(?:Thanh\s*Niên|Tuổi\s*Trẻ|VnExpress|Dân\s*Trí|Lao\s*Động|Tiền\s*Phong)\s*(?:,\s*(?:đến\s+)?ngày\s+\d{1,2}[/\.]?\d{0,2}\.?)?\s*$', ' ', text, flags=re.IGNORECASE)
+    # Remove markdown artifacts: "*Việt Nam", "-19 Boys'"
+    text = re.sub(r'[*\-]\s*([A-ZÀ-Ỹ])', r'\1', text)
+    # Fix markdown-damaged alphanumeric tokens: "-19" → "U19", "-2" → "U2"
+    text = re.sub(r'(?i)(?:^|(?<=\s))[-–—]\s*(\d{1,2}\s*(?:boy|girl|team|u\d|giải))', r'U\1', text)
     # Remove truncated sentence fragments at end (text ending mid-word with short lowercase word + period)
-    # Only remove truly truncated patterns like "chuyá»ƒn.", "tá»• ch." â€” NOT codes like "E10."
-    text = re.sub(r'\b[a-zÃ -á»¹]{1,3}\.\s*$', ' ', text)
-    # Remove navigation-menu-like category sequences at start: "Kinh táº¿ Kinh táº¿ xanh..."
-    category_kw = r'(?:kinh táº¿|thá»ƒ thao|giáº£i trÃ­|tháº¿ giá»›i|trong nÆ°á»›c|quá»‘c táº¿|phÃ¡p luáº­t|sá»©c khá»e|giÃ¡o dá»¥c|du lá»‹ch|khoa há»c|cÃ´ng nghá»‡|xe|báº¥t Ä‘á»™ng sáº£n|vÄƒn hÃ³a|Ä‘á»i sá»‘ng|an ninh|quÃ¢n sá»±|chÃ­nh trá»‹|doanh nghiá»‡p|ngÃ¢n hÃ ng|chá»©ng khoÃ¡n|xÃ£ há»™i|lao Ä‘á»™ng|chÃ­nh sÃ¡ch|phÃ¡t triá»ƒn|mÃ´i trÆ°á»ng|biá»ƒn Ä‘áº£o|kinh doanh|tiÃªu dÃ¹ng|bÃ³ng Ä‘Ã¡|bÃ³ng rá»•|quáº§n vá»£t|cáº§u lÃ´ng|bÆ¡i lá»™i|Ä‘iá»n kinh|vÃµ thuáº­t|tennis)'
-    text = re.sub(rf"^\s*(?:{category_kw})(?:\s+(?:xanh|sá»‘|24h|online|má»›i|nÃ³ng|-\s*\w+))?(?:\s+(?:,?\s*|-?\s*)?{category_kw})+\s*", " ", text, flags=re.IGNORECASE)
-    # Remove category nav + timestamp: "Kinh doanh TiÃªu dÃ¹ng Thá»© hai, 01/06/2026 - 09:00 :"
-    text = re.sub(r'(?i)^(?:kinh doanh|tiÃªu dÃ¹ng|thá»i sá»±|trong nÆ°á»›c|quá»‘c táº¿|thá»ƒ thao|giáº£i trÃ­|sá»©c khá»e|Ä‘á»i sá»‘ng|giÃ¡o dá»¥c|vÄƒn hÃ³a|phÃ¡p luáº­t)(?:\s+(?:kinh doanh|tiÃªu dÃ¹ng|thá»i sá»±|trong nÆ°á»›c|quá»‘c táº¿|thá»ƒ thao|giáº£i trÃ­|sá»©c khá»e|Ä‘á»i sá»‘ng|giÃ¡o dá»¥c|vÄƒn hÃ³a|phÃ¡p luáº­t))*\s+(?:thá»©\s+(?:hai|ba|bá»‘n|nÄƒm|sÃ¡u|báº£y|cn)|monday|tuesday|wednesday|thursday|friday|saturday|sunday)\s*,?\s*\d{1,2}[/\.]\d{1,2}[/\.]\d{4}\s*[-â€“â€”:]+\s*\d{1,2}:\d{2}\s*:?\s*', ' ', text)
-    # Standalone day+timestamp: "Thá»© hai, 01/06/2026 - 09:00 :"
-    text = re.sub(r'(?i)^(?:thá»©\s+(?:hai|ba|bá»‘n|nÄƒm|sÃ¡u|báº£y|cn)|monday|tuesday|wednesday|thursday|friday|saturday|sunday)\s*,?\s*\d{1,2}[/\.]\d{1,2}[/\.]\d{4}\s*[-â€“â€”:]+\s*\d{1,2}:\d{2}\s*:?\s*', ' ', text)
-    # Remove author byline with newspaper: "Minh Huyá»n (DÃ¢n trÃ­) -" or "TÃªn TÃ¡c Giáº£ (BÃ¡o) -"
-    text = re.sub(r'[A-ZÃ€-á»¸][a-zÃ -á»¹]+(?:\s+[A-ZÃ€-á»¸][a-zÃ -á»¹]+)*\s+\([^)]+\)\s*[-â€“â€”:]+\s*', ' ', text)
+    # Only remove truly truncated patterns like "chuyển.", "tổ ch." — NOT codes like "E10."
+    text = re.sub(r'\b[a-zà-ỹ]{1,3}\.\s*$', ' ', text)
+    # Remove navigation-menu-like category sequences at start: "Kinh tế Kinh tế xanh..."
+    category_kw = r'(?:kinh tế|thể thao|giải trí|thế giới|trong nước|quốc tế|pháp luật|sức khỏe|giáo dục|du lịch|khoa học|công nghệ|xe|bất động sản|văn hóa|đời sống|an ninh|quân sự|chính trị|doanh nghiệp|ngân hàng|chứng khoán|xã hội|lao động|chính sách|phát triển|môi trường|biển đảo|kinh doanh|tiêu dùng|bóng đá|bóng rổ|quần vợt|cầu lông|bơi lội|điền kinh|võ thuật|tennis)'
+    text = re.sub(rf"^\s*(?:{category_kw})(?:\s+(?:xanh|số|24h|online|mới|nóng|-\s*\w+))?(?:\s+(?:,?\s*|-?\s*)?{category_kw})+\s*", " ", text, flags=re.IGNORECASE)
+    # Remove category nav + timestamp: "Kinh doanh Tiêu dùng Thứ hai, 01/06/2026 - 09:00 :"
+    text = re.sub(r'(?i)^(?:kinh doanh|tiêu dùng|thời sự|trong nước|quốc tế|thể thao|giải trí|sức khỏe|đời sống|giáo dục|văn hóa|pháp luật)(?:\s+(?:kinh doanh|tiêu dùng|thời sự|trong nước|quốc tế|thể thao|giải trí|sức khỏe|đời sống|giáo dục|văn hóa|pháp luật))*\s+(?:thứ\s+(?:hai|ba|bốn|năm|sáu|bảy|cn)|monday|tuesday|wednesday|thursday|friday|saturday|sunday)\s*,?\s*\d{1,2}[/\.]\d{1,2}[/\.]\d{4}\s*[-–—:]+\s*\d{1,2}:\d{2}\s*:?\s*', ' ', text)
+    # Standalone day+timestamp: "Thứ hai, 01/06/2026 - 09:00 :"
+    text = re.sub(r'(?i)^(?:thứ\s+(?:hai|ba|bốn|năm|sáu|bảy|cn)|monday|tuesday|wednesday|thursday|friday|saturday|sunday)\s*,?\s*\d{1,2}[/\.]\d{1,2}[/\.]\d{4}\s*[-–—:]+\s*\d{1,2}:\d{2}\s*:?\s*', ' ', text)
+    # Remove author byline with newspaper: "Minh Huyền (Dân trí) -" or "Tên Tác Giả (Báo) -"
+    text = re.sub(r'[A-ZÀ-Ỹ][a-zà-ỹ]+(?:\s+[A-ZÀ-Ỹ][a-zà-ỹ]+)*\s+\([^)]+\)\s*[-–—:]+\s*', ' ', text)
     # Remove AP/Reuters image caption artifacts: "1 of 4 | ...", "2 of 2 | ...", "(Photo: ...)"
     # Pattern with pipe: "1 of 4 | Some caption text"
     text = re.sub(r'\d+\s+of\s+\d+\s*\|\s*[^\n]*', ' ', text)
@@ -919,19 +962,19 @@ def _clean_snippet_content(text: str) -> str:
     text = re.sub(r'Copy\s+Link\s+copied', ' ', text)
     text = re.sub(r'-->\s*-->', ' ', text)
     text = re.sub(r'(?:Print|Email|X|Bluesky|Flipboard|Reddit|Share|Save|Bookmark|Send)\s+(?:Print|Email|X|Bluesky|Flipboard|Reddit|Share|Save|Bookmark|Send)?', ' ', text)
-    # Remove "Leer en espaÃ±ol" / language switch links
-    text = re.sub(r'(?i)Leer\s+en\s+espaÃ±ol', ' ', text)
+    # Remove "Leer en español" / language switch links
+    text = re.sub(r'(?i)Leer\s+en\s+español', ' ', text)
     text = re.sub(r'(?i)Read\s+in\s+\w+', ' ', text)
     # Remove AP template artifacts: "By , [monthFull] [day], [year]"
     text = re.sub(r'By\s*,?\s*\[monthFull\]\s*\[day\],\s*\[year\]', ' ', text)
     # Remove "By Updated [hour]:[minute]" / placeholder template artifacts
     text = re.sub(r'By\s+Updated\s+\[hour\]:\[minute\][^,\.]*[,\.]?\s*', ' ', text)
-    text = re.sub(r'By\s*,?\s*(?:[A-ZÃ€-á»¸][a-zÃ -á»¹]+\s+){0,3}\[monthFull\]\s*\[day\],\s*\[year\]', ' ', text)
+    text = re.sub(r'By\s*,?\s*(?:[A-ZÀ-Ỹ][a-zà-ỹ]+\s+){0,3}\[monthFull\]\s*\[day\],\s*\[year\]', ' ', text)
     # Remove "Updated [hour]:[minute] [AMPM] [timezone]" template artifacts
     text = re.sub(r'Updated\s+\[hour\]:\[minute\]\s+\[AMPM\]\s+\[timezone\]', ' ', text)
     text = re.sub(r'\[(?:hour|minute|AMPM|timezone|monthFull|day|year)\]', ' ', text, flags=re.IGNORECASE)
-    # Remove conservative leading byline names: "Viá»‡t DÅ©ng - ..." or "Viá»‡t DÅ©ng Theo ..."
-    text = re.sub(r'^(?:[A-ZÃ€-á»¸][a-zÃ -á»¹]+\s+){1,3}[A-ZÃ€-á»¸][a-zÃ -á»¹]+\s*(?:\([^)]+\))?\s*(?:[-â€“â€”:]|Theo\b)\s*', ' ', text)
+    # Remove conservative leading byline names: "Việt Dũng - ..." or "Việt Dũng Theo ..."
+    text = re.sub(r'^(?:[A-ZÀ-Ỹ][a-zà-ỹ]+\s+){1,3}[A-ZÀ-Ỹ][a-zà-ỹ]+\s*(?:\([^)]+\))?\s*(?:[-–—:]|Theo\b)\s*', ' ', text)
 
     # Remove markdown artifacts from scraped content: "## Read Next", "**bold**", etc.
     text = re.sub(r'#{1,6}\s+', ' ', text)  # Markdown headers
@@ -941,17 +984,17 @@ def _clean_snippet_content(text: str) -> str:
     # Remove "Read Next" / "Related" / "More" navigation headers
     text = re.sub(r'(?i)\b(Read Next|Related|More on this|You may also like|Sponsored|Advertisement)\b', ' ', text)
 
-    # Remove category labels: "Asia Pacificcategory" â†’ "Asia Pacific"
-    # Handle concatenated: "Pacificcategory" â†’ "Pacific" (no space before)
-    # Handle spaced: "Sports category" â†’ "Sports" (with space before)
-    # Handle mid-word: "BusinesscategoryEuro" â†’ "BusinessEuro"
+    # Remove category labels: "Asia Pacificcategory" → "Asia Pacific"
+    # Handle concatenated: "Pacificcategory" → "Pacific" (no space before)
+    # Handle spaced: "Sports category" → "Sports" (with space before)
+    # Handle mid-word: "BusinesscategoryEuro" → "BusinessEuro"
     # Remove standalone "category" or "categories" with or without leading space
     text = re.sub(r'(?i)\s*categories?\b', ' ', text)
     # Also handle concatenated form where category is stuck to another word
     text = re.sub(r'(?i)categor[a-z]*', '', text)
 
-    # Remove time-ago patterns: "4 giá» trÆ°á»›c", "2 days ago", "3 hours ago", "5 mins ago"
-    text = re.sub(r'(?i)\d+\s+(gi\u1edd|phÃºt|giá»|ng\u00e0y|tu\u1ea7n|th\u00e1ng|n\u0103m)\s+tr\u01b0\u1edbc\b', ' ', text)
+    # Remove time-ago patterns: "4 giờ trước", "2 days ago", "3 hours ago", "5 mins ago"
+    text = re.sub(r'(?i)\d+\s+(gi\u1edd|phút|giờ|ng\u00e0y|tu\u1ea7n|th\u00e1ng|n\u0103m)\s+tr\u01b0\u1edbc\b', ' ', text)
     text = re.sub(r'(?i)\d+\s+(second|minute|hour|day|week|month|year)s?\s+ago\b', ' ', text)
 
     # Remove leading timestamp patterns: "01/06 19:30" at start of content
@@ -959,18 +1002,18 @@ def _clean_snippet_content(text: str) -> str:
 
     # Strip Vietnamese meta-text sentences (start, end, or anywhere).
     meta_sentence_patterns = [
-        r"(?:Báº£n tin Ä‘Æ°á»£c Ä‘Äƒng lÃºc|BÃ i viáº¿t Ä‘Æ°á»£c Ä‘Äƒng lÃºc|ÄÄƒng lÃºc|Cáº­p nháº­t lÃºc)\s+[^.\n]+\s*[,.\n]",
-        r"(?:ÄÄƒng ngÃ y|Publication date)\s+[^.\n]+\s*[,.\n]",
-        r"ÄÃ¢y lÃ  nhÃ³m thÃ´ng tin Ä‘Ã¡ng chÃº Ã½[^.\n]+[.\n]",
-        r"Ná»™i dung bÃ i viáº¿t[^.\n]+[.\n]",
-        r"toÃ n bá»™ thÃ´ng tin chÃ­nh[^.\n]+[.\n]",
-        r"(?:theo|via)\s+(?:VietnamNet|Tuá»•i\s*Tráº»|DÃ¢n\s*TrÃ­|VnExpress|Thanh\s*NiÃªn|Lao\s*Äá»™ng|Tiá»n\s*Phong|BÃ¡o\s*Má»›i|BÃ¡o\s+Äáº¥t\s+Viá»‡t|BÃ¡o\s+Má»›i)\s*[,.\n]",
-        r"NgoÃ i ra,\s*báº£n\s+tin\s+[^\n]+Ä‘á» cáº­p viá»‡c\s+",
-        r"trong thá»i gian gáº§n Ä‘Ã¢y\s*,?\s*cÆ° dÃ¢n máº¡ng[^.\n]+[.\n]",
-        r"váº«n náº±m trong khung 48 giá» gáº§n nháº¥t\s*[,.\n]",
-        r"Má»i Ä‘á»™c giáº£ theo dÃµi thÃªm[^.\n]*[.\n]",
-        r"Má»i quÃ½ Ä‘á»™c giáº£[^.\n]*[.\n]",
-        r"Xem thÃªm[^.\n]*[.\n]",
+        r"(?:Bản tin được đăng lúc|Bài viết được đăng lúc|Đăng lúc|Cập nhật lúc)\s+[^.\n]+\s*[,.\n]",
+        r"(?:Đăng ngày|Publication date)\s+[^.\n]+\s*[,.\n]",
+        r"Đây là nhóm thông tin đáng chú ý[^.\n]+[.\n]",
+        r"Nội dung bài viết[^.\n]+[.\n]",
+        r"toàn bộ thông tin chính[^.\n]+[.\n]",
+        r"(?:theo|via)\s+(?:VietnamNet|Tuổi\s*Trẻ|Dân\s*Trí|VnExpress|Thanh\s*Niên|Lao\s*Động|Tiền\s*Phong|Báo\s*Mới|Báo\s+Đất\s+Việt|Báo\s+Mới)\s*[,.\n]",
+        r"Ngoài ra,\s*bản\s+tin\s+[^\n]+đề cập việc\s+",
+        r"trong thời gian gần đây\s*,?\s*cư dân mạng[^.\n]+[.\n]",
+        r"vẫn nằm trong khung 48 giờ gần nhất\s*[,.\n]",
+        r"Mời độc giả theo dõi thêm[^.\n]*[.\n]",
+        r"Mời quý độc giả[^.\n]*[.\n]",
+        r"Xem thêm[^.\n]*[.\n]",
         r"Read more[^.\n]*[.\n]",
         r"Subscribe to[^.\n]*[.\n]",
         r"Click here to[^.\n]*[.\n]",
@@ -984,15 +1027,15 @@ def _clean_snippet_content(text: str) -> str:
     text = re.sub(r'\s+', ' ', text).strip()
     text = _strip_news_leadin_noise(text)
     text = re.sub(
-        r'^(?:[A-ZÃ€-á»¸][a-zÃ -á»¹]+\s+){1,3}[A-ZÃ€-á»¸][a-zÃ -á»¹]+\s+(?=(Ngoáº¡i\s+trÆ°á»Ÿng|Tá»•ng\s+thá»‘ng|Thá»§\s+tÆ°á»›ng|Bá»™\s+|QuÃ¢n\s+|Má»¹\s+|Nga\s+|Iran\s+|Ukraine\s+|Israel\s+))',
+        r'^(?:[A-ZÀ-Ỹ][a-zà-ỹ]+\s+){1,3}[A-ZÀ-Ỹ][a-zà-ỹ]+\s+(?=(Ngoại\s+trưởng|Tổng\s+thống|Thủ\s+tướng|Bộ\s+|Quân\s+|Mỹ\s+|Nga\s+|Iran\s+|Ukraine\s+|Israel\s+))',
         ' ',
         text,
     ).strip()
 
-    # Remove interview subheadings/prompts: "ThÆ°a Ã´ng,", "Theo Ä‘Ã³,", "ChÆ°a ghi nháº­n tiÃªu cá»±c tá»« ngÆ°á»i dÃ¢n"
-    text = re.sub(r'(?i)\b(thÆ°a\s+Ã´ng|thÆ°a\s+bÃ |theo\s+Ä‘Ã³|chÆ°a\s+ghi\s+nháº­n\s+tiÃªu\s+cá»±c|nháº­n\s+Ä‘á»‹nh\s+trÃªn)\b\s*,?\s*', ' ', text)
-    # Remove interview question headings: "Niá»m tin khu vá»±c tÆ° nhÃ¢n tÄƒng ThÆ°a Ã´ng,"
-    text = re.sub(r'(?i)\b(niá»m tin|thá»‹ trÆ°á»ng|káº¿t quáº£|Ä‘Ã¡nh giÃ¡|nháº­n Ä‘á»‹nh|pháº£n há»“i|bÃ¡o cÃ¡o)\s+(khu vá»±c\s+)?(tÆ° nhÃ¢n|ngÆ°á»i dÃ¢n|doanh nghiá»‡p|chuyÃªn gia|nhÃ  Ä‘áº§u tÆ°)\s+(tÄƒng|giáº£m|thay Ä‘á»•i|cho biáº¿t|pháº£n Ã¡nh|láº¡c quan|bi quan)\s+thÆ°a\s+(Ã´ng|bÃ )\b\s*,?\s*', ' ', text)
+    # Remove interview subheadings/prompts: "Thưa ông,", "Theo đó,", "Chưa ghi nhận tiêu cực từ người dân"
+    text = re.sub(r'(?i)\b(thưa\s+ông|thưa\s+bà|theo\s+đó|chưa\s+ghi\s+nhận\s+tiêu\s+cực|nhận\s+định\s+trên)\b\s*,?\s*', ' ', text)
+    # Remove interview question headings: "Niềm tin khu vực tư nhân tăng Thưa ông,"
+    text = re.sub(r'(?i)\b(niềm tin|thị trường|kết quả|đánh giá|nhận định|phản hồi|báo cáo)\s+(khu vực\s+)?(tư nhân|người dân|doanh nghiệp|chuyên gia|nhà đầu tư)\s+(tăng|giảm|thay đổi|cho biết|phản ánh|lạc quan|bi quan)\s+thưa\s+(ông|bà)\b\s*,?\s*', ' ', text)
     # Clean up resulting double spaces
     text = re.sub(r'\s{2,}', ' ', text).strip()
 
@@ -1064,7 +1107,7 @@ def _decode_ddg_redirect_url(href: str) -> str:
 def _normalize_search_query(query: str) -> str:
     """Normalize query text while preserving Vietnamese accents."""
     normalized = re.sub(r"\s+", " ", (query or "").strip())
-    normalized = re.sub(r"[â€‹â€Œâ€ï»¿]", "", normalized)
+    normalized = re.sub(r"[​‌‍﻿]", "", normalized)
     return normalized.strip(" \t\n\r,;:")
 
 
@@ -1089,33 +1132,33 @@ def _query_has_any_keyword(query: str, keywords: list[str]) -> bool:
 
 def _query_has_realtime_hint(query: str) -> bool:
     lower = query.lower()
-    hints = ["hÃ´m nay", "má»›i nháº¥t", "latest", "breaking", "vá»«a", "má»›i ra", "24h", "24 giá»", "recent", "hiá»‡n táº¡i", "current", "now"]
+    hints = ["hôm nay", "mới nhất", "latest", "breaking", "vừa", "mới ra", "24h", "24 giờ", "recent", "hiện tại", "current", "now"]
     return any(hint in lower for hint in hints)
 
 
 def _build_time_filter_intent(query: str, is_news: bool) -> Dict[str, str]:
     """Build internal time-filter intent before sending to providers."""
     lower = (query or "").lower()
-    if "7 ngÃ y" in lower or "tuáº§n nÃ y" in lower or "past week" in lower:
+    if "7 ngày" in lower or "tuần này" in lower or "past week" in lower:
         return {"sort_by": "date", "time_range": "past_7d"}
     if is_news or _query_has_realtime_hint(query):
         return {"sort_by": "date", "time_range": "past_24h"}
     return {"sort_by": "relevance", "time_range": "past_48h"}
 
 
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# ══════════════════════════════════════════════════════════════════════════════
 # SEARCH KEYWORD DETECTION
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# ══════════════════════════════════════════════════════════════════════════════
 
 _PRICE_KEYWORDS = [
-    "giÃ¡ xÄƒng", "giÃ¡ vÃ ng", "giÃ¡ dáº§u", "giÃ¡ gas", "giÃ¡ Ä‘iá»‡n",
-    "giÃ¡ bao nhiÃªu", "bao nhiÃªu tiá»n", "giÃ¡ cáº£",
+    "giá xăng", "giá vàng", "giá dầu", "giá gas", "giá điện",
+    "giá bao nhiêu", "bao nhiêu tiền", "giá cả",
 ]
 
 _STOCK_KEYWORDS = [
-    "cá»• phiáº¿u", "chá»©ng khoÃ¡n", "mÃ£ chá»©ng khoÃ¡n", "thá»‹ trÆ°á»ng chá»©ng khoÃ¡n",
+    "cổ phiếu", "chứng khoán", "mã chứng khoán", "thị trường chứng khoán",
     "vn-index", "vnindex", "vn30", "hnx", "hose", "upcom",
-    "giÃ¡ cá»• phiáº¿u", "stock", "cá»• pháº§n",
+    "giá cổ phiếu", "stock", "cổ phần",
 ]
 
 
@@ -1143,9 +1186,9 @@ def extract_stock_ticker(query: str) -> Optional[str]:
     return None
 
 
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# ══════════════════════════════════════════════════════════════════════════════
 # NEWS DOMAIN LISTS (for Tavily include_domains filtering)
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# ══════════════════════════════════════════════════════════════════════════════
 
 _VN_NEWS_DOMAINS = [
     DOMAIN_VNEXPRESS, DOMAIN_TUOITRE, DOMAIN_THANHNIEN, DOMAIN_DANTRI,
@@ -1329,7 +1372,7 @@ def _news_source_score(domain: str, category: str) -> int:
     if category == "game":
         if normalized in _GAME_OFFICIAL_DOMAINS:
             return 80
-        # VN reputable game sources â€” check BEFORE generic reputable
+        # VN reputable game sources — check BEFORE generic reputable
         if normalized.endswith(".vn") and normalized in _GAME_REPUTABLE_DOMAINS:
             return 70
         if normalized in _GAME_REPUTABLE_DOMAINS:
@@ -1456,18 +1499,18 @@ def _detect_news_category(query: str) -> str:
     """Detect news category from query for domain filtering.
 
     Categories merged based on real Vietnamese news organization:
-    - Law (PhÃ¡p luáº­t) + Military (QuÃ¢n sá»±) â†’ merged into domestic
+    - Law (Pháp luật) + Military (Quân sự) → merged into domestic
       (because law/military news in VN is usually Politics/Current Affairs)
     - Other categories kept separate (clear boundaries)
     """
     q = query.lower()
 
-    # International (check first â€” world news, diplomacy, military world)
+    # International (check first — world news, diplomacy, military world)
     intl_keywords = [
-        "tháº¿ giá»›i", "quá»‘c táº¿", "world", "international", "global",
-        "má»¹", "trung quá»‘c", "nga", "ukraine", "israel", "gaza",
-        "chÃ¢u Ã¢u", "chÃ¢u Ã¡", "nato", "trump", "biden", "putin",
-        "ngoáº¡i giao", "liÃªn há»£p quá»‘c", "lhq",
+        "thế giới", "quốc tế", "world", "international", "global",
+        "mỹ", "trung quốc", "nga", "ukraine", "israel", "gaza",
+        "châu âu", "châu á", "nato", "trump", "biden", "putin",
+        "ngoại giao", "liên hợp quốc", "lhq",
     ]
     if _query_has_any_keyword(query, intl_keywords):
         return "international"
@@ -1476,19 +1519,19 @@ def _detect_news_category(query: str) -> str:
     game_keywords = [
         "honkai", "genshin", "wuthering", "wuwa", "zenless", "zzz",
         "arknights", "endfield", "enfield", "fgo",
-        "mobile legends", "liÃªn quÃ¢n", "valorant", "game", "gaming", "esports", "esport", "trÃ² chÆ¡i",
+        "mobile legends", "liên quân", "valorant", "game", "gaming", "esports", "esport", "trò chơi",
         "patch", "update game", "banner", "gacha", "reroll", "tier list",
-        "thá»ƒ thao Ä‘iá»‡n tá»­",
+        "thể thao điện tử",
     ]
     if _query_has_any_keyword(query, game_keywords):
         return "game"
 
-    # Health (check before science â€” health queries often contain "research", "study")
+    # Health (check before science — health queries often contain "research", "study")
     health_keywords = [
-        "sá»©c khá»e", "y táº¿", "bá»‡nh", "thuá»‘c", "vaccine", "dá»‹ch bá»‡nh",
-        "bá»‡nh viá»‡n", "phÃ²ng bá»‡nh", "chÄƒm sÃ³c sá»©c khá»e", "bÃ¡c sÄ©",
-        "ung thÆ°", "tim máº¡ch", "tiá»ƒu Ä‘Æ°á»ng", "covid", "sá»‘t xuáº¥t huyáº¿t",
-        "tay chÃ¢n miá»‡ng", "dinh dÆ°á»¡ng", "thá»±c pháº©m chá»©c nÄƒng",
+        "sức khỏe", "y tế", "bệnh", "thuốc", "vaccine", "dịch bệnh",
+        "bệnh viện", "phòng bệnh", "chăm sóc sức khỏe", "bác sĩ",
+        "ung thư", "tim mạch", "tiểu đường", "covid", "sốt xuất huyết",
+        "tay chân miệng", "dinh dưỡng", "thực phẩm chức năng",
         # English keywords
         "health", "medical", "hospital", "doctor", "patient", "treatment",
         "pandemic", "outbreak", "medicine", "pharma", "drug", "therapy",
@@ -1498,10 +1541,10 @@ def _detect_news_category(query: str) -> str:
 
     # Science
     science_keywords = [
-        "khoa há»c", "khÃ¡m phÃ¡", "nghiÃªn cá»©u", "phÃ¡t minh", "vÅ© trá»¥",
-        "hÃ nh tinh", "máº·t trÄƒng", "sao há»a", "nasa", "mÃ´i trÆ°á»ng",
-        "biáº¿n Ä‘á»•i khÃ­ háº­u", "nÄƒng lÆ°á»£ng tÃ¡i táº¡o", "khÃ­ háº­u",
-        "sinh há»c", "váº­t lÃ½", "hÃ³a há»c", "thiÃªn vÄƒn",
+        "khoa học", "khám phá", "nghiên cứu", "phát minh", "vũ trụ",
+        "hành tinh", "mặt trăng", "sao hỏa", "nasa", "môi trường",
+        "biến đổi khí hậu", "năng lượng tái tạo", "khí hậu",
+        "sinh học", "vật lý", "hóa học", "thiên văn",
         # English keywords
         "science", "research", "discovery", "breakthrough", "planet", "moon",
         "mars", "space", "astronomy", "climate change", "renewable energy",
@@ -1510,31 +1553,31 @@ def _detect_news_category(query: str) -> str:
     if _query_has_any_keyword(query, science_keywords):
         return "science"
 
-    # Sport (check BEFORE education â€” "thá»ƒ thao há»c sinh" should be sport, not education)
-    sport_keywords = ["thá»ƒ thao", "bÃ³ng Ä‘Ã¡", "bÃ³ng rá»•", "tennis", "sport", "football", "giáº£i Ä‘áº¥u", "tráº­n Ä‘áº¥u", "bÃ³ng chuyá»n", "bÆ¡i lá»™i"]
+    # Sport (check BEFORE education — "thể thao học sinh" should be sport, not education)
+    sport_keywords = ["thể thao", "bóng đá", "bóng rổ", "tennis", "sport", "football", "giải đấu", "trận đấu", "bóng chuyền", "bơi lội"]
     if _query_has_any_keyword(query, sport_keywords):
         return "sport"
 
-    # Sport (check BEFORE education â€” "thá»ƒ thao há»c sinh" should be sport, not education)
-    sport_keywords = ["thá»ƒ thao", "bÃ³ng Ä‘Ã¡", "bÃ³ng rá»•", "tennis", "sport", "football", "giáº£i Ä‘áº¥u", "tráº­n Ä‘áº¥u", "bÃ³ng chuyá»n", "bÆ¡i lá»™i"]
+    # Sport (check BEFORE education — "thể thao học sinh" should be sport, not education)
+    sport_keywords = ["thể thao", "bóng đá", "bóng rổ", "tennis", "sport", "football", "giải đấu", "trận đấu", "bóng chuyền", "bơi lội"]
     if _query_has_any_keyword(query, sport_keywords):
         return "sport"
 
     # Education
     education_keywords = [
-        "giÃ¡o dá»¥c", "tuyá»ƒn sinh", "thi cá»­", "Ä‘áº¡i há»c", "cao Ä‘áº³ng",
-        "du há»c", "há»c phÃ­", "há»c bá»•ng", "trÆ°á»ng há»c", "giáº£ng viÃªn",
-        "sinh viÃªn", "há»c sinh", "ká»³ thi", "tá»‘t nghiá»‡p", "lá»›p 10",
-        "thpt quá»‘c gia", "Ä‘Ã¡nh giÃ¡ nÄƒng lá»±c", "Ä‘iá»ƒm chuáº©n",
+        "giáo dục", "tuyển sinh", "thi cử", "đại học", "cao đẳng",
+        "du học", "học phí", "học bổng", "trường học", "giảng viên",
+        "sinh viên", "học sinh", "kỳ thi", "tốt nghiệp", "lớp 10",
+        "thpt quốc gia", "đánh giá năng lực", "điểm chuẩn",
     ]
     if _query_has_any_keyword(query, education_keywords):
         return "education"
 
     # Travel
     travel_keywords = [
-        "du lá»‹ch", "khÃ¡ch sáº¡n", "vÃ© mÃ¡y bay", "Ä‘iá»ƒm Ä‘áº¿n", "lá»… há»™i du lá»‹ch",
-        "du lá»‹ch viá»‡t nam", "Ä‘Ã  láº¡t", "nha trang", "háº¡ long", "phÃº quá»‘c",
-        "sapa", "huáº¿", "há»™i an", "Ä‘Ã  náºµng", "tour du lá»‹ch",
+        "du lịch", "khách sạn", "vé máy bay", "điểm đến", "lễ hội du lịch",
+        "du lịch việt nam", "đà lạt", "nha trang", "hạ long", "phú quốc",
+        "sapa", "huế", "hội an", "đà nẵng", "tour du lịch",
         # English keywords
         "travel", "tourism", "hotel", "flight", "destination", "resort",
         "vacation", "trip", "backpack", "holiday", "visit vietnam",
@@ -1544,9 +1587,9 @@ def _detect_news_category(query: str) -> str:
 
     # Culture
     culture_keywords = [
-        "vÄƒn hÃ³a", "nghá»‡ thuáº­t", "di sáº£n", "lá»… há»™i", "truyá»n thá»‘ng",
-        "sÃ¡ch", "vÄƒn há»c", "sÃ¢n kháº¥u", "mÃºa", "hÃ¡t", "tuá»“ng", "chÃ¨o",
-        "ca trÃ¹", "quan há»", "di tÃ­ch", "báº£o tÃ ng", "vÄƒn hÃ³a viá»‡t",
+        "văn hóa", "nghệ thuật", "di sản", "lễ hội", "truyền thống",
+        "sách", "văn học", "sân khấu", "múa", "hát", "tuồng", "chèo",
+        "ca trù", "quan họ", "di tích", "bảo tàng", "văn hóa việt",
         # English keywords
         "cultural", "heritage", "festival", "traditional", "museum",
         "literature", "performing arts", "folk song", "unesco",
@@ -1556,51 +1599,51 @@ def _detect_news_category(query: str) -> str:
 
     # Lifestyle
     lifestyle_keywords = [
-        "Ä‘á»i sá»‘ng", "phong cÃ¡ch sá»‘ng", "gia Ä‘Ã¬nh", "náº¥u Äƒn", "mÃ³n ngon",
-        "nhÃ  cá»­a", "tÃ¬nh yÃªu", "hÃ´n nhÃ¢n", "máº¹o váº·t", "cuá»™c sá»‘ng",
-        "áº©m thá»±c", "thá»i trang", "lÃ m Ä‘áº¹p", "decor", "ná»™i tháº¥t",
+        "đời sống", "phong cách sống", "gia đình", "nấu ăn", "món ngon",
+        "nhà cửa", "tình yêu", "hôn nhân", "mẹo vặt", "cuộc sống",
+        "ẩm thực", "thời trang", "làm đẹp", "decor", "nội thất",
     ]
     if _query_has_any_keyword(query, lifestyle_keywords):
         return "lifestyle"
 
     # Youth
     youth_keywords = [
-        "nhá»‹p sá»‘ng tráº»", "giá»›i tráº»", "xu hÆ°á»›ng", "hot trend", "gen z",
-        "máº¡ng xÃ£ há»™i", "tiktok", "facebook", "youtube", "streamer",
+        "nhịp sống trẻ", "giới trẻ", "xu hướng", "hot trend", "gen z",
+        "mạng xã hội", "tiktok", "facebook", "youtube", "streamer",
         "idol", "fandom", "kpop", "vpop", "teen",
     ]
     if _query_has_any_keyword(query, youth_keywords):
         return "youth"
 
     # Tech
-    tech_keywords = ["cÃ´ng nghá»‡", "tech", "technology", "ai", "smartphone", "laptop", "Ä‘iá»‡n thoáº¡i", "sáº£n pháº©m má»›i", "xe Ä‘iá»‡n", "xe hÆ¡i"]
+    tech_keywords = ["công nghệ", "tech", "technology", "ai", "smartphone", "laptop", "điện thoại", "sản phẩm mới", "xe điện", "xe hơi"]
     if _query_has_any_keyword(query, tech_keywords):
         return "tech"
 
     # Finance
-    finance_keywords = ["kinh táº¿", "tÃ i chÃ­nh", "chá»©ng khoÃ¡n", "ngÃ¢n hÃ ng", "finance", "stock", "gdp", "doanh nghiá»‡p", "khá»Ÿi nghiá»‡p", "báº¥t Ä‘á»™ng sáº£n"]
+    finance_keywords = ["kinh tế", "tài chính", "chứng khoán", "ngân hàng", "finance", "stock", "gdp", "doanh nghiệp", "khởi nghiệp", "bất động sản"]
     if _query_has_any_keyword(query, finance_keywords):
         return "finance"
 
     # Entertainment
-    entertainment_keywords = ["giáº£i trÃ­", "showbiz", "phim", "Ã¢m nháº¡c", "ca sÄ©", "movie", "music", "mv", "sao viá»‡t", "nghá»‡ sÄ©"]
+    entertainment_keywords = ["giải trí", "showbiz", "phim", "âm nhạc", "ca sĩ", "movie", "music", "mv", "sao việt", "nghệ sĩ"]
     if _query_has_any_keyword(query, entertainment_keywords):
         return "entertainment"
 
     # Default: domestic
-    # Includes: Politics (ChÃ­nh trá»‹), Law (PhÃ¡p luáº­t), Military (QuÃ¢n sá»±), Society (XÃ£ há»™i), Current Affairs (Thá»i sá»±)
-    # Because in VN media, law/military/politics news all live under "Thá»i sá»±/ChÃ­nh trá»‹"
+    # Includes: Politics (Chính trị), Law (Pháp luật), Military (Quân sự), Society (Xã hội), Current Affairs (Thời sự)
+    # Because in VN media, law/military/politics news all live under "Thời sự/Chính trị"
     return "domestic"
 
 
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# ══════════════════════════════════════════════════════════════════════════════
 # TAVILY SEARCH
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# ══════════════════════════════════════════════════════════════════════════════
 
 def _tavily_search_depth(is_price: bool, is_stock: bool, is_news: bool, query: str = "") -> str:
     if is_price or is_stock or is_news:
         return "advanced"
-    # Game queries (banner, character, gacha) cáº§n advanced depth
+    # Game queries (banner, character, gacha) cần advanced depth
     game_hints = ["arknights", "endfield", "enfield", "honkai", "genshin", "wuthering", "banner", "gacha"]
     if any(hint in query.lower() for hint in game_hints):
         return "advanced"
@@ -1621,14 +1664,14 @@ def _build_tavily_search_query(query: str, is_news: bool) -> str:
     if "banner" in lower and any(game in lower for game in ["honkai", "genshin", "wuthering", "arknights", "endfield", "enfield"]):
         return query
 
-    needs_date = is_news or _query_has_realtime_hint(query) or "tin tá»©c" in lower
+    needs_date = is_news or _query_has_realtime_hint(query) or "tin tức" in lower
     if not needs_date:
         return query
 
     date_str = datetime.now(_VN_TZ).strftime('%d/%m/%Y')
-    refined = query if date_str in query else f"{query} ngÃ y {date_str}"
-    if "má»›i nháº¥t" not in lower and "latest" not in lower:
-        refined = f"{refined} má»›i nháº¥t"
+    refined = query if date_str in query else f"{query} ngày {date_str}"
+    if "mới nhất" not in lower and "latest" not in lower:
+        refined = f"{refined} mới nhất"
     return refined
 
 
@@ -1682,25 +1725,25 @@ def _build_tavily_request(
 
         date_str = datetime.now(_VN_TZ).strftime("%d/%m/%Y")
         if date_str not in payload["query"]:
-            payload["query"] = f"{payload['query']} ngÃ y {date_str}"
-        if time_intent.get("sort_by") == "date" and "má»›i nháº¥t" not in payload["query"].lower():
-            payload["query"] = f"{payload['query']} má»›i nháº¥t"
+            payload["query"] = f"{payload['query']} ngày {date_str}"
+        if time_intent.get("sort_by") == "date" and "mới nhất" not in payload["query"].lower():
+            payload["query"] = f"{payload['query']} mới nhất"
 
     return payload
 
 
 _JUNK_NEWS_PATTERNS = [
-    "trang tin cáº­p nháº­t", "kÃªnh cung cáº¥p", "trang tin tá»©c", "cáº­p nháº­t nhanh chÃ³ng",
-    "theo dÃµi tin tá»©c hÃ ng giá»", "ná»™i dung bao gá»“m", "Ä‘á»c bÃ¡o online", "tin má»›i nháº¥t 24h",
-    "cáº­p nháº­t liÃªn tá»¥c", "cÃ¡c trang bÃ¡o lá»›n", "ngÆ°á»i dÃ¹ng dá»… dÃ ng", "má»i báº¡n Ä‘á»c",
-    "bÃ¡o Ä‘iá»‡n tá»­", "thÃ´ng tin Ä‘áº§y Ä‘á»§ vÃ  háº¥p dáº«n", "chi tiáº¿t cÃ¡c tin tá»©c", "náº¯m báº¯t xu hÆ°á»›ng",
-    "xem thÃªm táº¡i", "click Ä‘á»ƒ xem", "nháº¥n vÃ o Ä‘Ã¢y", "bÃ¡o tuá»•i tráº» - tin tá»©c má»›i nháº¥t",
-    "tin nhanh, tin nÃ³ng", "tin tá»©c vÃ  dá»¯ liá»‡u kinh táº¿", "tin tá»©c má»›i nháº¥t trÃªn cÃ¡c lÄ©nh vá»±c",
-    "Ä‘Äƒng nháº­p xin chÃ o", "Ä‘Äƒng xuáº¥t", "facebook youtube tiktok", "tin tá»©c move",
+    "trang tin cập nhật", "kênh cung cấp", "trang tin tức", "cập nhật nhanh chóng",
+    "theo dõi tin tức hàng giờ", "nội dung bao gồm", "đọc báo online", "tin mới nhất 24h",
+    "cập nhật liên tục", "các trang báo lớn", "người dùng dễ dàng", "mời bạn đọc",
+    "báo điện tử", "thông tin đầy đủ và hấp dẫn", "chi tiết các tin tức", "nắm bắt xu hướng",
+    "xem thêm tại", "click để xem", "nhấn vào đây", "báo tuổi trẻ - tin tức mới nhất",
+    "tin nhanh, tin nóng", "tin tức và dữ liệu kinh tế", "tin tức mới nhất trên các lĩnh vực",
+    "đăng nhập xin chào", "đăng xuất", "facebook youtube tiktok", "tin tức move",
     "download the app", "newsletters subscribe", "information you can trust",
     "our standards", "subscriber agreement", "non-commercial use",
-    "podcast youtube cáº§n biáº¿t rao váº·t", "cÃ i Ä‘áº·t tÃ i khoáº£n tin Ä‘Ã£ lÆ°u", "táº¥t cáº£ chuyÃªn má»¥c",
-    "tin Ä‘Ã£ lÆ°u bÃ¬nh luáº­n cá»§a báº¡n", "lá»‹ch sá»­ giao dá»‹ch", "vÃ o tuá»•i tráº» sao",
+    "podcast youtube cần biết rao vặt", "cài đặt tài khoản tin đã lưu", "tất cả chuyên mục",
+    "tin đã lưu bình luận của bạn", "lịch sử giao dịch", "vào tuổi trẻ sao",
 ]
 
 _NON_NEWS_PAGE_PATTERNS = [
@@ -1710,17 +1753,17 @@ _NON_NEWS_PAGE_PATTERNS = [
 ]
 
 _VAGUE_TITLE_PATTERNS = [
-    "Ä‘iá»ƒm tin", "Ä‘iá»ƒm bÃ¡o", "Ä‘iá»ƒm loáº¡t", "toÃ n cáº£nh", "tá»•ng há»£p",
-    "váº¥n Ä‘á» nÃ³ng", "nÃ³ng trong ngÃ y", "báº£n tin", "nhÃ¬n láº¡i", "cáº­p nháº­t nhanh", "Ä‘á»c nhanh",
+    "điểm tin", "điểm báo", "điểm loạt", "toàn cảnh", "tổng hợp",
+    "vấn đề nóng", "nóng trong ngày", "bản tin", "nhìn lại", "cập nhật nhanh", "đọc nhanh",
 ]
 
 _GENERIC_PAGE_TITLE_PATTERNS = [
-    "trang chá»§", "tin má»›i nháº¥t", "tin nhanh 24h", "tin kinh táº¿", "nhá»‹p sá»‘ng kinh táº¿",
-    "tuá»•i tráº» online", "gamek", "genk", "pc gamer", "vnexpress", "vneconomy",
-    "thÃ´ng tin má»›i nháº¥t", "kÃªnh tin game", "tin tá»©c game", "mobile apps",
+    "trang chủ", "tin mới nhất", "tin nhanh 24h", "tin kinh tế", "nhịp sống kinh tế",
+    "tuổi trẻ online", "gamek", "genk", "pc gamer", "vnexpress", "vneconomy",
+    "thông tin mới nhất", "kênh tin game", "tin tức game", "mobile apps",
 ]
 
-_NEWS_SIGNAL_KEYWORDS = ["chÃ­nh phá»§", "quá»‘c há»™i", "giao thÃ´ng", "Ä‘iá»‡n", "xÄƒng", "lÃ£i suáº¥t", "gdp", "ra máº¯t", "phÃ¡t hÃ nh", "cáº­p nháº­t", "sá»± kiá»‡n", "nghá»‹ Ä‘á»‹nh", "quyáº¿t Ä‘á»‹nh", "luáº­t", "ban hÃ nh", "phÃª duyá»‡t", "kÃ½", "tháº¯ng", "Ä‘Ã¡nh báº¡i", "tuyÃªn bá»‘", "cÃ´ng bá»‘", "khá»Ÿi tá»‘", "báº¯t giá»¯", "thÆ°á»£ng Ä‘á»‰nh", "nasa", "war", "phÃ¡t hiá»‡n", "hÃ nh tinh", "vÅ© trá»¥", "cháº¥n Ä‘á»™ng", "ná»• sÃºng", "tai náº¡n", "há»a hoáº¡n", "lÅ© lá»¥t", "bÃ£o", "Ä‘á»™ng Ä‘áº¥t"]
+_NEWS_SIGNAL_KEYWORDS = ["chính phủ", "quốc hội", "giao thông", "điện", "xăng", "lãi suất", "gdp", "ra mắt", "phát hành", "cập nhật", "sự kiện", "nghị định", "quyết định", "luật", "ban hành", "phê duyệt", "ký", "thắng", "đánh bại", "tuyên bố", "công bố", "khởi tố", "bắt giữ", "thượng đỉnh", "nasa", "war", "phát hiện", "hành tinh", "vũ trụ", "chấn động", "nổ súng", "tai nạn", "hỏa hoạn", "lũ lụt", "bão", "động đất"]
 
 
 def _has_specific_title_signal(title_lower: str) -> bool:
@@ -1783,7 +1826,7 @@ def _is_stale_by_years(combined: str, title: str, now: datetime) -> bool:
     
     VERY CONSERVATIVE: Only reject if the year appears to be a publication date
     (e.g., "2022" standalone in title or as the ONLY date indicator).
-    Years mentioned in phrases like "nÄƒm 2024" are context, not publication dates.
+    Years mentioned in phrases like "năm 2024" are context, not publication dates.
     """
     years_found = re.findall(r"\b(20[1-2]\d)\b", combined)
     if not years_found:
@@ -1817,7 +1860,7 @@ def _is_stale_by_years(combined: str, title: str, now: datetime) -> bool:
             return True
         return False
     
-    # Year only in content â€” likely context, not publication date
+    # Year only in content — likely context, not publication date
     # Don't filter unless the year is 3+ years old
     three_years_ago = current_year - 3
     all_very_old = all(int(y) < three_years_ago for y in years_found)
@@ -1834,11 +1877,11 @@ def _is_stale_by_dates(combined: str, title: str, now: datetime) -> bool:
     Only filter if there are CLEAR date references (DD/MM/YYYY format with year).
     Skip ambiguous short date patterns that could be stock prices, percentages, etc.
     """
-    # Only use full date patterns (DD/MM/YYYY) â€” these are unambiguous
+    # Only use full date patterns (DD/MM/YYYY) — these are unambiguous
     full_date_patterns = re.findall(r"(\d{1,2})[/\-.](\d{1,2})[/\-.](\d{4})", combined)
     
-    # Also check for Vietnamese date format: "ngÃ y DD thÃ¡ng MM nÄƒm YYYY"
-    vn_date_patterns = re.findall(r"ngÃ y\s+(\d{1,2})\s+thÃ¡ng\s+(\d{1,2})\s+nÄƒm\s+(\d{4})", combined)
+    # Also check for Vietnamese date format: "ngày DD tháng MM năm YYYY"
+    vn_date_patterns = re.findall(r"ngày\s+(\d{1,2})\s+tháng\s+(\d{1,2})\s+năm\s+(\d{4})", combined)
     
     ages: list[int] = []
     
@@ -1876,7 +1919,7 @@ def _is_junk_news_result(title: str, content: str, url: str = "", allow_english_
     combined = f"{title} {content} {url}".lower()
     title_lower = title.lower().strip()
 
-    # FIX #1: Filter weather forecast pages â€” VOV weather junk
+    # FIX #1: Filter weather forecast pages — VOV weather junk
     if _is_vov_weather_junk(content, title):
         return True
     if "bbc.co.uk/sounds" in combined or re.search(r"(?i)^live\s+news\s*$", title_lower):
@@ -1891,10 +1934,10 @@ def _is_junk_news_result(title: str, content: str, url: str = "", allow_english_
     # (many VN sites syndicate AP/Reuters with English titles but Vietnamese content)
     if not allow_english_international:
         if _is_english_content(content) and _is_english_content(title):
-            # Both title AND content are English â†’ filter
+            # Both title AND content are English → filter
             return True
         if _is_english_content(content) and not _is_vn_news_url(url):
-            # Content is English AND not from VN source â†’ filter
+            # Content is English AND not from VN source → filter
             return True
 
     if _is_homepage_or_section_result(title, content, url) and not allow_english_international:
@@ -1919,10 +1962,10 @@ def _is_junk_news_result(title: str, content: str, url: str = "", allow_english_
             return False  # Title/source is specific enough, accept despite short content
         return True
 
-    # TASK 2: Whitelist (Kim bÃ i miá»…n tá»­) cho RSS Uy tÃ­n (Tin tá»« vnexpress, tuoitre, dantri, thanhnien, vneconomy, vtv...)
+    # TASK 2: Whitelist (Kim bài miễn tử) cho RSS Uy tín (Tin từ vnexpress, tuoitre, dantri, thanhnien, vneconomy, vtv...)
     trusted_vn_rss_domains = {"vnexpress.net", "tuoitre.vn", "dantri.com.vn", "thanhnien.vn", "vneconomy.vn", "vtv.vn", "vietnamnet.vn", "plo.vn"}
     if _normalize_domain(url) in trusted_vn_rss_domains and "rss" in url.lower():
-        # Bypass zombie filter cho cÃ¡c RSS ná»™i Ä‘á»‹a vÃ¬ bÃ i Ä‘Ã£ Ä‘Æ°á»£c BTV duyá»‡t
+        # Bypass zombie filter cho các RSS nội địa vì bài đã được BTV duyệt
         pass
     else:
         now_val = now or datetime.now(_VN_TZ)
@@ -2033,15 +2076,15 @@ def _select_search_items(
 
 
 _RERANK_STOPWORDS = {
-    "la", "lÃ ", "va", "vÃ ", "cho", "voi", "vá»›i", "trong", "gá»“m", "nhung", "nhá»¯ng", "cua", "cá»§a",
+    "la", "là", "va", "và", "cho", "voi", "với", "trong", "gồm", "nhung", "những", "cua", "của",
     "the", "for", "and", "with", "from", "into", "what", "when", "where", "who", "how", "current",
-    "latest", "today", "news", "tin", "moi", "má»›i", "nhat", "nháº¥t", "hom", "hÃ´m", "nay", "ai",
+    "latest", "today", "news", "tin", "moi", "mới", "nhat", "nhất", "hom", "hôm", "nay", "ai",
 }
 
 
 def _tokenize_rerank_text(text: str) -> set[str]:
     tokens = {
-        tok for tok in re.findall(r"[a-zA-ZÃ€-á»¹0-9]+", (text or "").lower())
+        tok for tok in re.findall(r"[a-zA-ZÀ-ỹ0-9]+", (text or "").lower())
         if len(tok) >= 2
     }
     return {tok for tok in tokens if tok not in _RERANK_STOPWORDS}
@@ -2087,7 +2130,7 @@ def _metadata_relevance_score(query: str, item: Dict[str, Any], is_news: bool) -
 
     freshness_blob = f"{title} {snippet} {item.get('published_date', '')}".lower()
     now = datetime.now(_VN_TZ)
-    today_markers = ["hÃ´m nay", "má»›i nháº¥t", "latest", "today", "update", now.strftime("%d/%m/%Y"), now.strftime("%Y-%m-%d")]
+    today_markers = ["hôm nay", "mới nhất", "latest", "today", "update", now.strftime("%d/%m/%Y"), now.strftime("%Y-%m-%d")]
     if _query_has_realtime_hint(query) and any(h in freshness_blob for h in today_markers):
         score += 1.8
 
@@ -2174,8 +2217,8 @@ def _async_enrich_selected_items(
         return selected_results
 
     # OPTIMIZATION 3: Reduced deep-read for news (4 instead of 10)
-    # Check if this is a news call by looking for "Ná»˜I DUNG" context
-    is_news_call = any("PUBLISHED:" in str(item) or "Ná»˜I DUNG" in str(item) for item in selected_results[:3])
+    # Check if this is a news call by looking for "NỘI DUNG" context
+    is_news_call = any("PUBLISHED:" in str(item) or "NỘI DUNG" in str(item) for item in selected_results[:3])
     if is_news_call:
         enrich_k = min(len(selected_results), min(4, result_limit))  # Was 10
     else:
@@ -2197,12 +2240,13 @@ def _async_enrich_selected_items(
 
     # OPTIMIZATION 3b: Shorter timeout for news (4s instead of 8s)
     page_timeout = 4 if is_news_call else 8
-    with ThreadPoolExecutor(max_workers=min(4, len(targets))) as executor:
+    executor = _DaemonPoolExecutor(max_workers=min(4, len(targets)))
+    try:
         future_map = {
             executor.submit(_fetch_page_evidence, url, page_timeout): idx
             for idx, url in targets
         }
-        for future in as_completed(future_map):
+        for future in as_completed(future_map, timeout=_EVIDENCE_TOTAL_TIMEOUT):
             idx = future_map[future]
             try:
                 evidence = future.result()
@@ -2216,6 +2260,10 @@ def _async_enrich_selected_items(
                 ["game8", "prydwen", "fandom", "wiki", "hoyolab", "gryphline"]
             ) else evidence_text[:2500]
             enriched[idx]["fetched_at"] = evidence.get("fetched_at", "") if isinstance(evidence, dict) else ""
+    except TimeoutError:
+        logger.warning("Page evidence enrichment exceeded %ss budget", _EVIDENCE_TOTAL_TIMEOUT)
+    finally:
+        executor.shutdown(wait=False, cancel_futures=True)
 
     return enriched
 
@@ -2243,7 +2291,7 @@ def _format_search_results(
 
     parts: List[str] = []
     if answer and not is_news:
-        parts.append(f"Tráº£ lá»i: {answer}")
+        parts.append(f"Trả lời: {answer}")
 
     is_general = not is_price and not is_stock
     is_game = any(hint in query.lower() for hint in ["arknights", "endfield", "enfield", "honkai", "genshin", "banner", "gacha"])
@@ -2263,7 +2311,7 @@ def _format_search_results(
         if brand_matched:
             selected_results = brand_matched
         else:
-            return f"KhÃ´ng tÃ¬m tháº¥y káº¿t quáº£ Ä‘Ã¡ng tin cáº­y cho '{query}' tá»« nguá»“n chÃ­nh thá»‘ng hiá»‡n táº¡i."
+            return f"Không tìm thấy kết quả đáng tin cậy cho '{query}' từ nguồn chính thống hiện tại."
 
     now = datetime.now(_VN_TZ)
     fetched_default = now.strftime("%Y-%m-%d %H:%M:%S UTC+7")
@@ -2304,7 +2352,7 @@ def _format_search_results(
                     truncated_evidence = truncated
             else:
                 truncated_evidence = cleaned_evidence
-            block += f"      Ná»˜I DUNG: {truncated_evidence}"
+            block += f"      NỘI DUNG: {truncated_evidence}"
         elif snippet:
             cleaned_snippet = _clean_snippet_content(snippet)
             # ALWAYS truncate at sentence boundary (never word boundary)
@@ -2326,11 +2374,11 @@ def _format_search_results(
         parts.append(block)
 
     if not parts:
-        return f"KhÃ´ng tÃ¬m tháº¥y káº¿t quáº£ cho: {query}"
+        return f"Không tìm thấy kết quả cho: {query}"
 
     time_intent = _build_time_filter_intent(query, is_news or _query_has_realtime_hint(query))
     header = (
-        f"Káº¿t quáº£ tÃ¬m kiáº¿m cho '{query}':\n"
+        f"Kết quả tìm kiếm cho '{query}':\n"
         f"Current datetime: {fetched_default}\n"
         f"Search policy: sort_by={time_intent.get('sort_by', 'relevance')}, time_range={time_intent.get('time_range', 'past_48h')}\n"
         f"Raw metadata candidates: {len(raw_results)}\n"
@@ -2401,9 +2449,9 @@ def _web_search_tavily(query: str, max_results: int = 5, is_news: bool = False, 
         raise e
 
 
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# ══════════════════════════════════════════════════════════════════════════════
 # PAGE EVIDENCE EXTRACTION (for DDG deep read)
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# ══════════════════════════════════════════════════════════════════════════════
 
 def _build_exa_request(query: str, max_results: int = 5) -> dict:
     """Build Exa search payload and keep it compatible with Exa text results."""
@@ -2444,7 +2492,7 @@ def _web_search_exa(query: str, max_results: int = 5) -> str:
     """Internal: call Exa as an optional AI search provider and return [KQ] blocks."""
     cleaned = _normalize_search_query(query)
     if not cleaned:
-        return "Vui lÃ²ng nháº­p truy váº¥n tÃ¬m kiáº¿m há»£p lá»‡."
+        return "Vui lòng nhập truy vấn tìm kiếm hợp lệ."
     if not settings.exa_api_key:
         raise RuntimeError("missing_exa_key")
 
@@ -2596,35 +2644,35 @@ def _extract_main_text(html_text: str) -> str:
 
     # Vietnamese UI/boilerplate patterns
     vn_boilerplate_patterns = [
-        r"\b(chia sáº»|like|thÃ­ch|yÃªu thÃ­ch)\b",
-        r"\b(theo dÃµi|follow|Ä‘Äƒng kÃ½)\b",
-        r"\b(trá»Ÿ láº¡i chá»§ Ä‘á»|trá»Ÿ láº¡i|vá» trang chá»§|quay láº¡i|back to top)\b",
-        r"\b(bÃ¬nh luáº­n|comment|gá»­i bÃ¬nh luáº­n)\b",
-        r"\b(chuyÃªn má»¥c|chá»§ Ä‘á»|category)\b",
-        r"\b(xem thÃªm|read more|Ä‘á»c tiáº¿p|tiáº¿p tá»¥c)\b",
-        r"\b(in bÃ i|gá»­i email|gá»­i cho báº¡n|forward)\b",
-        r"\b(cá»¡ chá»¯|font size|tÄƒng chá»¯|giáº£m chá»¯)\b",
-        r"\b(\d+\s+trá»Ÿ láº¡i chá»§ Ä‘á»|\d+\s+bÃ¬nh luáº­n|\d+\s+comment|\d+\s+chia sáº»)\b",
-        r"\b(thá»i gian Ä‘á»c|phÃºt Ä‘á»c|min read)\b",
-        r"\b(nháº­n xÃ©t|Ä‘Ã¡nh giÃ¡|rate)\b",
-        r"\b(bÃ¡o lá»—i|report|pháº£n Ã¡nh)\b",
-        # Section labels with count: "0 Thá»i sá»±", "5 BÃ¬nh luáº­n", "CÃ¹ng luáº­n bÃ n 0"
-        r"\b\d+\s+(thá»i sá»±|kinh táº¿|thá»ƒ thao|giáº£i trÃ­|tháº¿ giá»›i|phÃ¡p luáº­t|sá»©c khá»e|giÃ¡o dá»¥c|cÃ´ng nghá»‡|du lá»‹ch|xe|Ä‘á»i sá»‘ng)\b",
-        r"\b(cÃ¹ng\s+luáº­n\s+bÃ n|tháº£o\s+luáº­n|bÃ n\s+luáº­n)\s+\d+\b",
-        # Author role labels: "NhÃ  ngoáº¡i giao", "PV Thanh NiÃªn", "vÃ  1 tÃ¡c giáº£ khÃ¡c"
-        r"\b(NhÃ \s+bÃ¡o|PV|PhÃ³ng\s+viÃªn|NhÃ \s+ngoáº¡i\s+giao|ChuyÃªn\s+gia|Tiáº¿n\s+sÄ©|GiÃ¡o\s+sÆ°|TS|GS|PGS)\b",
-        r"\bvÃ \s+\d+\s+tÃ¡c\s+giáº£\s+khÃ¡c\b",
-        # Source labels: "Theo ghi nháº­n cá»§a PV", "Theo bÃ¡o cÃ¡o"
-        r"\b(theo\s+ghi\s+nháº­n\s+cá»§a|theo\s+bÃ¡o\s+cÃ¡o|theo\s+Ä‘Ã¡nh\s+giÃ¡|theo\s+thá»‘ng\s+kÃª)\b",
+        r"\b(chia sẻ|like|thích|yêu thích)\b",
+        r"\b(theo dõi|follow|đăng ký)\b",
+        r"\b(trở lại chủ đề|trở lại|về trang chủ|quay lại|back to top)\b",
+        r"\b(bình luận|comment|gửi bình luận)\b",
+        r"\b(chuyên mục|chủ đề|category)\b",
+        r"\b(xem thêm|read more|đọc tiếp|tiếp tục)\b",
+        r"\b(in bài|gửi email|gửi cho bạn|forward)\b",
+        r"\b(cỡ chữ|font size|tăng chữ|giảm chữ)\b",
+        r"\b(\d+\s+trở lại chủ đề|\d+\s+bình luận|\d+\s+comment|\d+\s+chia sẻ)\b",
+        r"\b(thời gian đọc|phút đọc|min read)\b",
+        r"\b(nhận xét|đánh giá|rate)\b",
+        r"\b(báo lỗi|report|phản ánh)\b",
+        # Section labels with count: "0 Thời sự", "5 Bình luận", "Cùng luận bàn 0"
+        r"\b\d+\s+(thời sự|kinh tế|thể thao|giải trí|thế giới|pháp luật|sức khỏe|giáo dục|công nghệ|du lịch|xe|đời sống)\b",
+        r"\b(cùng\s+luận\s+bàn|thảo\s+luận|bàn\s+luận)\s+\d+\b",
+        # Author role labels: "Nhà ngoại giao", "PV Thanh Niên", "và 1 tác giả khác"
+        r"\b(Nhà\s+báo|PV|Phóng\s+viên|Nhà\s+ngoại\s+giao|Chuyên\s+gia|Tiến\s+sĩ|Giáo\s+sư|TS|GS|PGS)\b",
+        r"\bvà\s+\d+\s+tác\s+giả\s+khác\b",
+        # Source labels: "Theo ghi nhận của PV", "Theo báo cáo"
+        r"\b(theo\s+ghi\s+nhận\s+của|theo\s+báo\s+cáo|theo\s+đánh\s+giá|theo\s+thống\s+kê)\b",
     ]
     for bp in vn_boilerplate_patterns:
         text = re.sub(bp, " ", text, flags=re.IGNORECASE)
 
     # Remove navigation-menu-like text sequences at start of text
-    # VN sites often have category lists like: "Kinh táº¿ Thá»ƒ thao Giáº£i trÃ­..." at the top
-    category_keywords = r'(?:kinh táº¿|thá»ƒ thao|giáº£i trÃ­|tháº¿ giá»›i|trong nÆ°á»›c|quá»‘c táº¿|phÃ¡p luáº­t|sá»©c khá»e|giÃ¡o dá»¥c|du lá»‹ch|khoa há»c|cÃ´ng nghá»‡|xe|báº¥t Ä‘á»™ng sáº£n|vÄƒn hÃ³a|Ä‘á»i sá»‘ng|an ninh|quÃ¢n sá»±|chÃ­nh trá»‹|doanh nghiá»‡p|ngÃ¢n hÃ ng|chá»©ng khoÃ¡n|xÃ£ há»™i|lao Ä‘á»™ng|viá»‡c lÃ m|mÃ´i trÆ°á»ng|biá»ƒn Ä‘áº£o|chÃ­nh sÃ¡ch|phÃ¡t triá»ƒn)'
+    # VN sites often have category lists like: "Kinh tế Thể thao Giải trí..." at the top
+    category_keywords = r'(?:kinh tế|thể thao|giải trí|thế giới|trong nước|quốc tế|pháp luật|sức khỏe|giáo dục|du lịch|khoa học|công nghệ|xe|bất động sản|văn hóa|đời sống|an ninh|quân sự|chính trị|doanh nghiệp|ngân hàng|chứng khoán|xã hội|lao động|việc làm|môi trường|biển đảo|chính sách|phát triển)'
     # Match 2+ category keywords (with optional modifiers) at start, then stop before actual content
-    nav_prefix = rf"^\s*(?:{category_keywords})(?:\s+(?:xanh|sá»‘|24h|online|má»›i|nÃ³ng|cáº­p nháº­t|-\s*\w+))?(?:\s+(?:,?\s*|-?\s*)?{category_keywords})+\s*"
+    nav_prefix = rf"^\s*(?:{category_keywords})(?:\s+(?:xanh|số|24h|online|mới|nóng|cập nhật|-\s*\w+))?(?:\s+(?:,?\s*|-?\s*)?{category_keywords})+\s*"
     text = re.sub(nav_prefix, " ", text, flags=re.IGNORECASE)
 
     # Strip > prefix from lines (blockquote artifacts)
@@ -2726,9 +2774,9 @@ def _extract_article_links_from_html(base_url: str, html_text: str, limit: int =
     return rows
 
 
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# ══════════════════════════════════════════════════════════════════════════════
 # DUCKDUCKGO SEARCH
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# ══════════════════════════════════════════════════════════════════════════════
 
 def _score_and_rank_records(query: str, records: List[Dict[str, str]]) -> List[Dict[str, str]]:
     """Score and rank search records based on query relevance and snippet quality."""
@@ -2811,7 +2859,7 @@ def _ddg_headers() -> Dict[str, str]:
 
 def _fetch_ddg_page(query: str, headers: Dict[str, str]) -> str:
     search_url = f"https://html.duckduckgo.com/html/?q={quote_plus(query)}"
-    # TASK 3: Háº¡ nhiá»‡t DuckDuckGo - Ã‰p timeout=5s Ä‘á»ƒ nháº£y nhanh sang nguá»“n khÃ¡c náº¿u máº¡ng ngháº½n
+    # TASK 3: Hạ nhiệt DuckDuckGo - Ép timeout=5s để nhảy nhanh sang nguồn khác nếu mạng nghẽn
     response = _session.get(search_url, headers=headers, timeout=5)
     page = response.text
     if response.status_code != 202 and 'class="result__snippet"' in page:
@@ -2904,7 +2952,7 @@ def _build_ddg_result_lines(
         )
         if evidence:
             cleaned_evidence = _clean_snippet_content(evidence)
-            block += f"      Ná»˜I DUNG: {cleaned_evidence[:1200].rsplit(' ', 1)[0] if len(cleaned_evidence) > 1200 else cleaned_evidence}"
+            block += f"      NỘI DUNG: {cleaned_evidence[:1200].rsplit(' ', 1)[0] if len(cleaned_evidence) > 1200 else cleaned_evidence}"
         elif snippet:
             cleaned_snippet = _clean_snippet_content(snippet)
             block += f"      SNIPPET: {cleaned_snippet[:content_limit]}"
@@ -2980,7 +3028,7 @@ def _web_search_duckduckgo(
             if brand_matched:
                 selected_items = brand_matched
             elif not selected_items:
-                return f"KhÃ´ng tÃ¬m tháº¥y káº¿t quáº£ Ä‘Ã¡ng tin cáº­y cho '{query}' tá»« nguá»“n chÃ­nh thá»‘ng hiá»‡n táº¡i."
+                return f"Không tìm thấy kết quả đáng tin cậy cho '{query}' từ nguồn chính thống hiện tại."
 
         return "\n".join(_build_ddg_result_lines(selected_items, is_general, is_stock))
     except DDGRateLimitError:
@@ -2991,7 +3039,7 @@ def _web_search_duckduckgo(
 
 def _should_use_news_mode(query: str) -> bool:
     lower = query.lower()
-    # Game queries (banner, character, gacha) cáº§n tÃ¬m wiki/guide, khÃ´ng pháº£i news article
+    # Game queries (banner, character, gacha) cần tìm wiki/guide, không phải news article
     game_markers = ["honkai", "genshin", "wuthering", "wuwa", "zenless", "zzz",
                     "arknights", "endfield", "enfield", "fgo",
                     "banner", "gacha", "reroll", "tier list", "rate up", "rate-up"]
@@ -2999,7 +3047,7 @@ def _should_use_news_mode(query: str) -> bool:
         return False
 
     news_hints = [
-        "tin", "news", "má»›i nháº¥t", "hÃ´m nay", "breaking", "cáº­p nháº­t",
+        "tin", "news", "mới nhất", "hôm nay", "breaking", "cập nhật",
         "patch", "event", "release",
     ]
     if any(hint in lower for hint in news_hints):
@@ -3036,7 +3084,7 @@ def _build_focused_game_query(query: str) -> str:
 
 def _focused_game_domains(query: str) -> list[str]:
     lower = query.lower()
-    # Báº¯t luÃ´n cáº£ trÆ°á»ng há»£p user gÃµ thiáº¿u chá»¯ "d" thÃ nh "enfield"
+    # Bắt luôn cả trường hợp user gõ thiếu chữ "d" thành "enfield"
     is_endfield = ("endfield" in lower or "enfield" in lower) and "-endfield" not in lower
     
     if "honkai" in lower:
@@ -3151,12 +3199,17 @@ def _append_page_evidence(search_output: str, query: str = "", max_links: int = 
         return search_output
 
     evidence_blocks: list[str] = [""] * len(links)
-    with ThreadPoolExecutor(max_workers=min(3, len(links))) as executor:
-        future_map = {
-            executor.submit(_fetch_page_evidence, item["url"], 5): (idx, item)
-            for idx, item in enumerate(links)
-        }
-        for future in as_completed(future_map):
+    executor = _DaemonPoolExecutor(max_workers=min(3, len(links)))
+    try:
+        try:
+            future_map = {
+                executor.submit(_fetch_page_evidence, item["url"], 5): (idx, item)
+                for idx, item in enumerate(links)
+            }
+        except Exception:
+            # Executor unavailable (e.g. interpreter shutting down) — skip evidence.
+            return search_output
+        for future in as_completed(future_map, timeout=_EVIDENCE_TOTAL_TIMEOUT):
             idx, item = future_map[future]
             try:
                 fetched = future.result()
@@ -3180,6 +3233,13 @@ def _append_page_evidence(search_output: str, query: str = "", max_links: int = 
                 f"      URL: {item['url']}\n"
                 f"      NOI DUNG: {evidence}{links_text}"
             )
+    except TimeoutError:
+        logger.warning(
+            "Page evidence fetch exceeded %ss budget; using partial evidence",
+            _EVIDENCE_TOTAL_TIMEOUT,
+        )
+    finally:
+        executor.shutdown(wait=False, cancel_futures=True)
 
     evidence_blocks = [
         re.sub(r"^\[DOC\d+\]", f"[DOC{idx}]", block)
@@ -3191,15 +3251,125 @@ def _append_page_evidence(search_output: str, query: str = "", max_links: int = 
     return f"{search_output}\n\nNOI DUNG DA DOC TU CAC LINK:\n" + "\n\n".join(evidence_blocks)
 
 
+_NEWS_QUERY_MARKERS = (
+    "tin tức", "tin tuc", "tin mới", "tin moi", "tin nóng", "tin nong",
+    "tin hot", "tin nổi bật", "tin noi bat", "bản tin", "ban tin",
+    "thời sự", "thoi su", "breaking news", "headline", "headlines",
+    "tin thế giới", "tin the gioi", "tin quốc tế", "tin quoc te",
+    "tin trong nước", "tin trong nuoc", "tin hot nhất", "tin nóng nhất",
+)
+
+
+def _looks_like_news_query(query: str) -> bool:
+    """Lightweight news-intent detection used to route web_search internally."""
+    normalized = unicodedata.normalize("NFD", (query or "").lower())
+    normalized = "".join(ch for ch in normalized if unicodedata.category(ch) != "Mn")
+    return any(marker in normalized for marker in _NEWS_QUERY_MARKERS)
+
+
+def _is_ddg_blocked_error(exc: BaseException) -> bool:
+    """True when a DDG exception matches the configured TLS/connection block signature."""
+    signature = (settings.search_ddg_blocked_signature or "").strip().lower()
+    return bool(signature) and signature in str(exc).lower()
+
+
+_ddg_blocked_count = 0
+_ddg_circuit_lock = threading.Lock()
+
+
+def _record_ddg_block() -> None:
+    """Count a blocking DDG failure and warn once the circuit is open."""
+    global _ddg_blocked_count
+    with _ddg_circuit_lock:
+        _ddg_blocked_count += 1
+        if _ddg_blocked_count >= settings.search_ddg_failure_threshold:
+            logger.warning(
+                "DDG blocked repeatedly (%d) — skipping DDG, using Tavily + Exa",
+                _ddg_blocked_count,
+            )
+
+
+def _ddg_should_skip() -> bool:
+    with _ddg_circuit_lock:
+        return _ddg_blocked_count >= settings.search_ddg_failure_threshold
+
+
+def _web_search_api_fallback(query: str, max_results: int) -> list[dict]:
+    """Combine Exa + Tavily API results for the best coverage when DDG fails."""
+    from core.search.providers import _exa_search, _tavily_search
+
+    combined: list[dict] = []
+    for provider in (_exa_search, _tavily_search):
+        try:
+            combined.extend(provider(query, max_results))
+        except Exception as exc:
+            if str(exc) not in ("missing_tavily_key", "missing_exa_key"):
+                logger.warning("Fallback search provider failed: %s", exc)
+    return combined
+
+
+def _web_search_run(query: str, max_results: int, is_news: bool) -> str:
+    """DDG-first search; on DDG failure, fall back to Tavily + Exa combined.
+
+    Repeated DDG blocks trip a circuit breaker that skips DDG entirely so the
+    user is not left waiting on a provider Yahoo is actively rejecting.
+    """
+    from core.search import _filter_news_items, _rewrite_news_query
+    from core.search.format import format_news_response, format_search_response
+    from core.search.providers import _ddg_news_search, _ddg_search
+
+    search_query = _rewrite_news_query(query) if is_news else query
+    items: list[dict] = []
+
+    if not _ddg_should_skip():
+        try:
+            if is_news:
+                items = _ddg_news_search(search_query, max_results * 3)
+            else:
+                items = _ddg_search(search_query, max_results + 3)
+        except Exception as exc:
+            if _is_ddg_blocked_error(exc):
+                _record_ddg_block()
+            logger.warning("DDG search failed: %s", exc)
+            items = []
+
+        if is_news:
+            items = _filter_news_items(items, query)
+
+    if len(items) >= 2:
+        if is_news:
+            return format_news_response(items, query, max_results)
+        return format_search_response(items, query, max_results)
+
+    items = _web_search_api_fallback(search_query, max_results)
+    if is_news:
+        items = _filter_news_items(items, query)
+
+    if not items:
+        return f"Không tìm thấy {'tin tức' if is_news else 'kết quả'} cho '{query}'."
+    if is_news:
+        return format_news_response(items, query, max_results)
+    return format_search_response(items, query, max_results)
+
+
 def web_search(query: str, max_results: int = 5) -> str:
-    """Compatibility wrapper around the unified core.search backend."""
+    """Web search and news: realtime search, article filtering, source links, and concise summaries.
+
+    Use for any real-time, time-sensitive, or news request: prices (xăng/vàng/
+    crypto), people, definitions, current events, breaking news, 'tin tức',
+    politics, sports, world or Vietnam headlines. Routes news-like queries to a
+    dedicated news backend, otherwise a general web backend (DDG → Tavily +
+    Exa), and returns formatted, deduplicated results with source URLs. Skips
+    DuckDuckGo automatically after repeated blocking failures.
+    """
     clean = (query or "").strip()
     if not clean:
-        return "Vui lÃ²ng nháº­p truy váº¥n tÃ¬m kiáº¿m há»£p lá»‡."
+        return "Vui lòng nhập truy vấn tìm kiếm hợp lệ."
 
-    from core.search import search as search_module_fn
-    result = search_module_fn(clean, max_results=max_results)
-    return _append_page_evidence(result, clean, max_links=min(5, max(1, max_results)))
+    is_news = _looks_like_news_query(clean)
+    result = _web_search_run(clean, max_results, is_news)
+    max_links = min(3, max(1, max_results)) if is_news else min(5, max(1, max_results))
+    return _append_page_evidence(result, clean, max_links=max_links)
 
 
 def _get_yahoo_stock_meta(ticker: str) -> Optional[dict[str, Any]]:
@@ -3532,9 +3702,9 @@ def get_stock_price(ticker: str) -> str:
     return f"M\u00ecnh ch\u01b0a x\u00e1c \u0111\u1ecbnh \u0111\u01b0\u1ee3c m\u00e3 giao d\u1ecbch ch\u00ednh x\u00e1c cho '{clean_query}', n\u00ean ch\u01b0a th\u1ec3 tr\u1ea3 gi\u00e1 c\u1ed5 phi\u1ebfu \u0111\u00e1ng tin c\u1eady."
 
 
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# ══════════════════════════════════════════════════════════════════════════════
 # MUSIC PLAYER TOOL
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# ══════════════════════════════════════════════════════════════════════════════
 # Opens music in the user's NORMAL browser (default profile, with login/extensions).
 # Window control (dedicated window for smoother behavior):
 #   - Play:   Ctrl+N to open a NEW Chromium window, then navigate to URL
@@ -4268,7 +4438,7 @@ def play_music(url_or_query: str) -> str:
 
 
 def _send_media_key_pause() -> bool:
-    """Send media play/pause key on Windows. This is a TOGGLE: pauseâ†”play."""
+    """Send media play/pause key on Windows. This is a TOGGLE: pause↔play."""
     import platform
 
     if platform.system() != "Windows":
@@ -4316,7 +4486,12 @@ def _close_ranked_music_match(song_hint: str | None, match_keys: List[str]) -> b
 
 
 def stop_music(song_hint: str | None = None) -> str:
-    """Stop music by closing the tracked music window."""
+    """Turn music OFF by closing the tracked music window (TẮT NHẠC / ĐÓNG NHẠC).
+
+    Fully ends playback and closes the window. Use for 'tắt nhạc', 'đóng nhạc',
+    'dừng hẳn', 'tắt bài hát'. For a temporary mid-song pause ('tạm dừng nhạc',
+    'dừng nhạc', 'ngừng phát giữa chừng'), call pause_music() instead.
+    """
     with _music_lock:
         if not _refresh_music_state_from_window():
             return "Hiện không có nhạc đang phát."
@@ -4336,7 +4511,13 @@ def stop_music(song_hint: str | None = None) -> str:
 
 
 def pause_music() -> str:
-    """Pause the tracked music window without closing it."""
+    """Pause the current song mid-play without closing the window (TẠM DỪNG NHẠC / DỪNG NHẠC).
+
+    Interrupts playback at the current point; the window stays open and can be
+    resumed. Use for 'tạm dừng nhạc', 'dừng nhạc', 'ngừng phát', 'dừng bài hát
+    giữa chừng'. To fully close the window ('tắt nhạc', 'đóng nhạc'), call
+    stop_music() instead.
+    """
     global _music_is_paused
 
     with _music_lock:
@@ -4356,7 +4537,7 @@ def pause_music() -> str:
 
 
 def resume_music() -> str:
-    """Resume paused music in the tracked music window."""
+    """Resume a paused song in the tracked music window (TIẾP TỤC PHÁT / PHÁT TIẾP)."""
     global _music_is_paused
 
     with _music_lock:

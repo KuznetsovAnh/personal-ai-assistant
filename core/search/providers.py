@@ -38,8 +38,8 @@ def _ddg_search(query: str, max_results: int = 5) -> list[dict[str, Any]]:
     except ImportError:
         from duckduckgo_search import DDGS
 
-    with DDGS() as ddgs:
-        results = list(ddgs.text(query, max_results=max_results, region="vn-vn"))
+    with DDGS(timeout=settings.search_ddg_timeout_sec) as ddgs:
+        results = list(ddgs.text(query, max_results=max_results, region="vn-vi"))
 
     items: list[dict[str, Any]] = []
     seen_urls: set[str] = set()
@@ -66,8 +66,8 @@ def _ddg_news_search(query: str, max_results: int = 5) -> list[dict[str, Any]]:
     except ImportError:
         from duckduckgo_search import DDGS
 
-    with DDGS() as ddgs:
-        results = list(ddgs.news(query, max_results=max_results, region="vn-vn"))
+    with DDGS(timeout=settings.search_ddg_timeout_sec) as ddgs:
+        results = list(ddgs.news(query, max_results=max_results, region="vn-vi"))
 
     items: list[dict[str, Any]] = []
     seen_urls: set[str] = set()
