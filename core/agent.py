@@ -63,6 +63,8 @@ def _get_current_datetime_str() -> str:
     )
 
 
+# NOTE: {current_datetime} is intentionally the LAST token. Keeping it here makes
+# the whole prompt prefix above stable so the provider can reuse its prompt/KV cache.
 SYSTEM_PROMPT_TEMPLATE = (
     "You are an intelligent personal AI assistant acting as a tool-using agent. "
     "Always follow this workflow: (1) read the user's message and identify the intent; "
@@ -80,7 +82,7 @@ SYSTEM_PROMPT_TEMPLATE = (
     "translation → translate_text(text, target_lang); "
     "local knowledge-base questions → knowledge_search(query). "
     "If no tool fits, answer from your own knowledge. "
-    "ANSWER RULES: {current_datetime} "
+    "ANSWER RULES: "
     "Priorities: 1) correctness, 2) relevance, 3) clarity, 4) brevity. "
     "Respond in the user's language and never switch unless asked. "
     "Summarize tool results into a clean, natural answer; never paste raw tool output "
@@ -102,7 +104,7 @@ SYSTEM_PROMPT_TEMPLATE = (
     "Write full subject-verb sentences with crisp rhythm, never terse or formulaic; do NOT insert trivial numbers/details just to bait a click. "
     "Source name = the outlet's display name (e.g. VnExpress, Tuổi Trẻ, Dân Trí); Article title = the original headline, rendered as a markdown hyperlink to its URL. "
     "Concrete example: 1) **\"Triều Tiên thử tên lửa dồn dập\"** : Triều Tiên phóng liên tiếp hai tên lửa đạn đạo ra vùng biển phía đông chỉ trong 3 giờ nhằm phô diễn năng lực hạt nhân. Động thái hiếm thấy này lập tức vấp phải sự cảnh giác và lên án gay gắt từ Hàn Quốc cùng Nhật Bản. [Nguồn : VnExpress - Triều Tiên phóng tên lửa liên tiếp trong vòng 3 giờ](https://example.com/bai-viet). "
-    "Rules: never reuse the same URL for two items; never copy a generic aggregator headline like 'Tin nóng thế giới ngày X' or 'Tổng hợp tin tức...'; never use '(via Source)' or '([Source](url))'; do not add a closing question."
+    "Rules: never reuse the same URL for two items; never copy a generic aggregator headline like 'Tin nóng thế giới ngày X' or 'Tổng hợp tin tức...'; never use '(via Source)' or '([Source](url))'; do not add a closing question. {current_datetime}"
 )
 
 
